@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- MenuBarExtra (macOS 13+) suppresses the dock icon automatically.
+         LSUIElement must NOT be set — it blocks MenuBarExtra from registering. -->
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+
+    <!-- Microphone access: shown to user on first recording attempt -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>VoiceScribe benötigt Mikrofon-Zugriff, um deine Sprache aufzunehmen und zu transkribieren.</string>
+
+    <!-- Accessibility access: shown when the app tries to insert text -->
+    <key>NSAccessibilityUsageDescription</key>
+    <string>VoiceScribe benötigt Bedienungshilfen-Zugriff, um transkribierten Text in das aktive Textfeld einzufügen.</string>
+
+    <!-- Allow HTTP connections to Ollama running on localhost -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsLocalNetworking</key>
+        <true/>
+    </dict>
+
+    <!-- Standard bundle metadata -->
+    <key>CFBundleIdentifier</key>
+    <string>com.stefanwiggeshoff.VoiceScribe</string>
+    <key>CFBundleName</key>
+    <string>VoiceScribe</string>
+    <key>CFBundleDisplayName</key>
+    <string>VoiceScribe</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>de</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+
+    <!-- Do not quit when the Settings window is closed -->
+    <key>NSSupportsAutomaticTermination</key>
+    <false/>
+    <key>NSSupportsSuddenTermination</key>
+    <false/>
+
+    <key>LSMinimumSystemVersion</key>
+    <string>14.0</string>
+</dict>
+</plist>

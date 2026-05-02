@@ -1,0 +1,69 @@
+name: VoiceScribe
+
+options:
+  bundleIdPrefix: com.stefanwiggeshoff
+  deploymentTarget:
+    macOS: "14.0"
+  xcodeVersion: "16.0"
+  generateEmptyDirectories: true
+  defaultConfig: Debug
+
+configs:
+  Debug: debug
+  Release: release
+
+packages:
+  WhisperKit:
+    url: https://github.com/argmaxinc/WhisperKit.git
+    from: "0.9.0"
+  KeyboardShortcuts:
+    url: https://github.com/sindresorhus/KeyboardShortcuts.git
+    from: "2.2.0"
+
+targets:
+  VoiceScribe:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: VoiceScribe
+        excludes:
+          - "**/*.md"
+    resources:
+      - path: VoiceScribe/Resources
+    dependencies:
+      - package: WhisperKit
+        product: WhisperKit
+      - package: KeyboardShortcuts
+        product: KeyboardShortcuts
+    settings:
+      base:
+        PRODUCT_NAME: VoiceScribe
+        PRODUCT_BUNDLE_IDENTIFIER: com.stefanwiggeshoff.VoiceScribe
+        SWIFT_VERSION: "5.9"
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
+        INFOPLIST_FILE: VoiceScribe/Info.plist
+        CODE_SIGN_ENTITLEMENTS: VoiceScribe/VoiceScribe.entitlements
+        ENABLE_HARDENED_RUNTIME: YES
+        # Menu bar apps don't need a dock icon
+        # LSUIElement in Info.plist handles this, but setting the app category
+        # helps with proper classification
+        APPLICATION_EXTENSION_API_ONLY: NO
+      configs:
+        debug:
+          CODE_SIGN_IDENTITY: "-"
+          DEVELOPMENT_TEAM: ""
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+        release:
+          CODE_SIGN_IDENTITY: "Apple Development"
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: ""
+
+schemes:
+  VoiceScribe:
+    build:
+      targets:
+        VoiceScribe: all
+    run:
+      config: Debug
+    archive:
+      config: Release

@@ -1,0 +1,35 @@
+# Xcode Build
+DerivedData/
+build/
+*.o
+*.d
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Xcode User Settings
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Packages/
+Package.resolved
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# Whisper Models (werden automatisch heruntergeladen, zu groß für Git)
+*.mlpackage
+*.mlmodelc
+
+# Credentials / Secrets
+*.pem
+*.key
+.env
