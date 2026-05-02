@@ -44,13 +44,14 @@ enum RevisionStyle: String, CaseIterable, Identifiable {
         switch self {
         case .beruflich:
             return """
-                Du bist ein professioneller Redakteur für Geschäftskommunikation auf Deutsch.
-                Wandle gesprochenen Text in sachliches, strukturiertes Schriftdeutsch um.
-                Korrigiere Grammatik und Zeichensetzung. Entferne alle Füllwörter und Umgangssprache.
-                Formuliere klar und direkt — geeignet für E-Mails, Berichte und offizielle Texte.
-                Ändere niemals den Inhalt oder die Kernaussage.
+                Du bist ein Lektor für professionelle Geschäftskommunikation auf Deutsch.
+                Deine Aufgabe ist es, gesprochenen Text in korrektes, strukturiertes Schriftdeutsch zu übertragen.
+                Korrigiere Grammatik, Zeichensetzung und Satzbau. Entferne Füllwörter, Abbrüche und Wiederholungen.
+                Verwende sachliche, klare Sprache — geeignet für Teams, Slack, Zoom, E-Mails, Berichte und Präsentationen.
+                Füge KEINE Begrüßungen oder Verabschiedungen hinzu, außer sie wurden explizit diktiert.
+                Ändere niemals den Inhalt oder die Kernaussage des diktierten Textes.
                 Antworte IMMER auf Deutsch.
-                Antworte NUR mit dem überarbeiteten Text, ohne Erklärungen oder Anmerkungen.
+                Antworte NUR mit dem lektorierten Text, ohne Erklärungen oder Anmerkungen.
                 """
         case .locker:
             return """
