@@ -23,6 +23,68 @@ enum RecordingMode: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
+enum RevisionStyle: String, CaseIterable, Identifiable {
+    case beruflich         = "beruflich"
+    case locker            = "locker"
+    case mitEmojis         = "mitEmojis"
+    case rageEntschaerfer  = "rageEntschaerfer"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .beruflich:        return "Beruflich"
+        case .locker:           return "Locker"
+        case .mitEmojis:        return "Mit Emojis"
+        case .rageEntschaerfer: return "Entschärfen"
+        }
+    }
+
+    var systemPrompt: String {
+        switch self {
+        case .beruflich:
+            return """
+                Du bist ein professioneller Redakteur für Geschäftskommunikation auf Deutsch.
+                Wandle gesprochenen Text in sachliches, strukturiertes Schriftdeutsch um.
+                Korrigiere Grammatik und Zeichensetzung. Entferne alle Füllwörter und Umgangssprache.
+                Formuliere klar und direkt — geeignet für E-Mails, Berichte und offizielle Texte.
+                Ändere niemals den Inhalt oder die Kernaussage.
+                Antworte IMMER auf Deutsch.
+                Antworte NUR mit dem überarbeiteten Text, ohne Erklärungen oder Anmerkungen.
+                """
+        case .locker:
+            return """
+                Du bist ein Freund, der Sprachnachrichten in lockere, natürliche Textnachrichten umwandelt.
+                Behalte den informellen Ton bei. Schreib wie man wirklich spricht — locker, direkt, menschlich.
+                Leichte Umgangssprache ist erwünscht. Entferne Abbrüche, Wiederholungen und Versprechungen.
+                Ändere niemals den Inhalt oder die Kernaussage.
+                Antworte IMMER auf Deutsch.
+                Antworte NUR mit dem überarbeiteten Text, ohne Erklärungen oder Anmerkungen.
+                """
+        case .mitEmojis:
+            return """
+                Du bist ein Freund, der Sprachnachrichten in lockere Textnachrichten mit Emojis umwandelt.
+                Behalte den informellen Ton bei. Schreib natürlich und entspannt.
+                Füge passende Emojis an sinnvollen Stellen ein — nicht zu viele, aber genug um den Text lebendig zu machen.
+                Entferne Abbrüche, Wiederholungen und Versprechungen.
+                Ändere niemals den Inhalt oder die Kernaussage.
+                Antworte IMMER auf Deutsch.
+                Antworte NUR mit dem überarbeiteten Text und Emojis, ohne Erklärungen oder Anmerkungen.
+                """
+        case .rageEntschaerfer:
+            return """
+                Du bist ein Kommunikationsberater, der wütende oder aggressive Texte entschärft.
+                Wandle den Text in einen ruhigen, sachlichen und konstruktiven Ton um.
+                Behalte die eigentliche Botschaft und alle konkreten Punkte vollständig bei — ändere nur den emotionalen Tonfall.
+                Entferne Beleidigungen, Drohungen und aggressive Formulierungen.
+                Das Ergebnis soll professionell und lösungsorientiert klingen, ohne den Inhalt zu verwässern.
+                Antworte IMMER auf Deutsch.
+                Antworte NUR mit dem entschärften Text, ohne Erklärungen oder Anmerkungen.
+                """
+        }
+    }
+}
+
 enum WhisperModelSize: String, CaseIterable, Identifiable {
     case tiny   = "tiny"
     case base   = "base"
@@ -67,6 +129,10 @@ final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(language, forKey: Keys.language) }
     }
 
+    @Published var revisionStyle: RevisionStyle {
+        didSet { UserDefaults.standard.set(revisionStyle.rawValue, forKey: Keys.revisionStyle) }
+    }
+
     private init() {
         let defaults = UserDefaults.standard
         mode = RecordingMode(rawValue: defaults.string(forKey: Keys.mode) ?? "") ?? .dictation
@@ -75,12 +141,14 @@ final class AppSettings: ObservableObject {
         // Ein leerer String führt zu einer verständlichen Fehlermeldung statt Timeout.
         ollamaModel = defaults.string(forKey: Keys.ollamaModel) ?? ""
         language = defaults.string(forKey: Keys.language) ?? "de"
+        revisionStyle = RevisionStyle(rawValue: defaults.string(forKey: Keys.revisionStyle) ?? "") ?? .beruflich
     }
 
     private enum Keys {
-        static let mode         = "vs_mode"
-        static let whisperModel = "vs_whisperModel"
-        static let ollamaModel  = "vs_ollamaModel"
-        static let language     = "vs_language"
+        static let mode          = "vs_mode"
+        static let whisperModel  = "vs_whisperModel"
+        static let ollamaModel   = "vs_ollamaModel"
+        static let language      = "vs_language"
+        static let revisionStyle = "vs_revisionStyle"
     }
 }

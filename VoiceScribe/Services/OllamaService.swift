@@ -112,7 +112,7 @@ final class OllamaService {
     ///   TERM=dumb     — prevents terminal control sequences / ANSI escape codes
     ///   NO_COLOR=1    — disables color output (used by many CLIs)
     ///   TERM_PROGRAM  — cleared so ollama doesn't detect an "advanced" terminal
-    func revise(text: String, model: String) async throws -> String {
+    func revise(text: String, model: String, style: RevisionStyle) async throws -> String {
         guard !model.isEmpty else { throw OllamaError.noModelSelected }
 
         guard let binaryPath = ollamaBinaryPaths.first(where: {
@@ -121,7 +121,7 @@ final class OllamaService {
             throw OllamaError.binaryNotFound
         }
 
-        let prompt = buildPrompt(for: text)
+        let prompt = buildPrompt(for: text, style: style)
 
         return try await withCheckedThrowingContinuation { continuation in
             let process = Process()
@@ -211,13 +211,7 @@ final class OllamaService {
 
     // MARK: - Prompt
 
-    private func buildPrompt(for text: String) -> String {
-        """
-        Überarbeite den folgenden gesprochenen Text in natürlich geschriebenes Deutsch. \
-        Korrigiere Grammatik und Zeichensetzung, entferne Füllwörter, strukturiere Sätze klar. \
-        Ändere NICHT den Inhalt. Antworte NUR mit dem überarbeiteten Text, ohne Erklärungen.
-
-        Text: \(text)
-        """
+    private func buildPrompt(for text: String, style: RevisionStyle) -> String {
+        "\(style.systemPrompt)\n\nText: \(text)"
     }
 }
