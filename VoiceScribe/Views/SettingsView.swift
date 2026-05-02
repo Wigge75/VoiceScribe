@@ -52,8 +52,15 @@ private struct GeneralTab: View {
                 .pickerStyle(.segmented)
 
                 if settings.mode == .revision {
+                    Picker("Standard-Stil", selection: $settings.revisionStyle) {
+                        ForEach(RevisionStyle.allCases, id: \.self) { style in
+                            Text(style.displayName).tag(style)
+                        }
+                    }
+                    .pickerStyle(.menu)
+
                     Label(
-                        "Überarbeitungs-Modus: Whisper transkribiert, Ollama verfeinert den Text.",
+                        "Überarbeitungs-Modus: Whisper transkribiert, KI verfeinert den Text im gewählten Stil.",
                         systemImage: "info.circle"
                     )
                     .font(.caption)

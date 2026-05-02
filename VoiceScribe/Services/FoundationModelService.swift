@@ -51,21 +51,12 @@ final class FoundationModelService {
 
     // MARK: - Revision
 
-    func revise(text: String) async throws -> String {
+    func revise(text: String, style: RevisionStyle) async throws -> String {
         guard isAvailable() else {
             throw FoundationModelRevisionError.notAvailable(reason: unavailabilityReason())
         }
 
-        let session = LanguageModelSession(instructions: """
-            Du bist ein präziser Textredakteur für die deutsche Sprache.
-            Der Nutzer ist ein Native German Speaker.
-            Wandle gesprochenen deutschen Text in natürlich geschriebenes Deutsch um.
-            Korrigiere Grammatik und Zeichensetzung, entferne Füllwörter, strukturiere Sätze klar.
-            Ändere niemals den Inhalt oder die Aussage des Textes.
-            Antworte IMMER auf Deutsch.
-            Antworte NUR mit dem überarbeiteten Text, ohne Erklärungen oder Anmerkungen.
-            """)
-
+        let session = LanguageModelSession(instructions: style.systemPrompt)
         let prompt = "Überarbeite den folgenden gesprochenen Text:\n\n\(text)"
         let response = try await session.respond(to: prompt)
         let result = response.content.trimmingCharacters(in: .whitespacesAndNewlines)

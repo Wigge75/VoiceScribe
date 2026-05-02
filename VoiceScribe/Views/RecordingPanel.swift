@@ -23,7 +23,7 @@ final class FloatingPanel: NSPanel {
 
     init() {
         super.init(
-            contentRect: NSRect(x: 0, y: 0, width: 400, height: 160),
+            contentRect: NSRect(x: 0, y: 0, width: 400, height: 220),
             styleMask: [.titled, .fullSizeContentView, .nonactivatingPanel],
             backing:   .buffered,
             defer:     false
@@ -68,7 +68,9 @@ final class PanelController {
         if panel == nil {
             let p = FloatingPanel()
             let hc = NSHostingController(rootView: AnyView(
-                RecordingPanelContent().environmentObject(viewModel)
+                RecordingPanelContent()
+                    .environmentObject(viewModel)
+                    .environmentObject(AppSettings.shared)
             ))
             p.contentViewController = hc
             panel = p

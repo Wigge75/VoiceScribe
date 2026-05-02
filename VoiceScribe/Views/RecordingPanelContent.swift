@@ -15,6 +15,7 @@ import SwiftUI
 struct RecordingPanelContent: View {
 
     @EnvironmentObject var viewModel: RecordingViewModel
+    @EnvironmentObject var settings: AppSettings
 
     var body: some View {
         ZStack {
@@ -52,6 +53,12 @@ struct RecordingPanelContent: View {
                         .buttonStyle(.plain)
                         .help("Aufnahme stoppen")
                     }
+                }
+
+                // ── Style-Picker (nur im Überarbeitungs-Modus) ─────────
+                if settings.mode == .revision {
+                    RevisionStylePicker()
+                        .transition(.opacity)
                 }
 
                 // ── Waveform (recording only) ───────────────────────────
@@ -125,7 +132,7 @@ struct RecordingPanelContent: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
         }
-        .frame(width: 400, height: 180)
+        .frame(width: 400, height: 220)
         .background(Color.clear)
         .animation(.easeInOut(duration: 0.2), value: stateLabel)
     }
@@ -141,8 +148,8 @@ struct RecordingPanelContent: View {
             ProgressView()
                 .controlSize(.small)
         case .revising:
-            Image(systemName: "sparkles")
-                .foregroundColor(.purple)
+            Image(systemName: AppSettings.shared.revisionStyle.sfSymbol)
+                .foregroundColor(AppSettings.shared.revisionStyle.accentColor)
         case .preview:
             Image(systemName: "checkmark.circle.fill")
                 .foregroundColor(.green)
@@ -173,6 +180,55 @@ struct RecordingPanelContent: View {
         case .done(let preview):     return "✓ \(preview.prefix(30))…"
         case .error(let msg):        return "Fehler: \(msg)"
         }
+    }
+}
+
+// MARK: - Revision Style Picker
+
+private struct RevisionStylePicker: View {
+    @EnvironmentObject var settings: AppSettings
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(RevisionStyle.allCases) { style in
+                Button {
+                    settings.revisionStyle = style
+                } label: {
+                    VStack(spacing: 2) {
+                        Image(systemName: style.sfSymbol)
+                            .font(.system(size: 11, weight: .medium))
+                        Text(style.displayName)
+                            .font(.system(size: 9, weight: .medium))
+                            .lineLimit(1)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 5)
+                    .background(
+                        settings.revisionStyle == style
+                            ? style.accentColor.opacity(0.15)
+                            : Color.clear
+                    )
+                    .foregroundColor(
+                        settings.revisionStyle == style
+                            ? style.accentColor
+                            : .secondary
+                    )
+                    .cornerRadius(6)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6)
+                            .strokeBorder(
+                                settings.revisionStyle == style
+                                    ? style.accentColor.opacity(0.4)
+                                    : Color.clear,
+                                lineWidth: 1
+                            )
+                    )
+                }
+                .buttonStyle(.plain)
+                .help(style.displayName)
+            }
+        }
+        .animation(.easeInOut(duration: 0.15), value: settings.revisionStyle)
     }
 }
 

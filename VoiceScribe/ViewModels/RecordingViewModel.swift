@@ -295,12 +295,14 @@ final class RecordingViewModel: ObservableObject {
     // entweder den überarbeiteten Text oder das Original als Fallback.
     // Fehlermeldungen werden über revisionWarning an das Panel weitergegeben.
     private func performRevision(of text: String) async -> String {
+        let style = settings.revisionStyle
+
         // Bevorzugter Weg: Apple Intelligence (On-Device, kein Setup nötig)
         if #available(macOS 26, *) {
             let service = FoundationModelService()
             if service.isAvailable() {
                 do {
-                    return try await service.revise(text: text)
+                    return try await service.revise(text: text, style: style)
                 } catch {
                     revisionWarning = .failed(error.localizedDescription)
                     return text
@@ -312,7 +314,7 @@ final class RecordingViewModel: ObservableObject {
             // Fallback: Ollama (wenn installiert und Modell gewählt)
             if await ollamaService.isRunning(), !settings.ollamaModel.isEmpty {
                 do {
-                    return try await ollamaService.revise(text: text, model: settings.ollamaModel)
+                    return try await ollamaService.revise(text: text, model: settings.ollamaModel, style: style)
                 } catch {
                     revisionWarning = .failed(error.localizedDescription)
                     return text
@@ -333,7 +335,7 @@ final class RecordingViewModel: ObservableObject {
             return text
         }
         do {
-            return try await ollamaService.revise(text: text, model: settings.ollamaModel)
+            return try await ollamaService.revise(text: text, model: settings.ollamaModel, style: style)
         } catch {
             revisionWarning = .failed(error.localizedDescription)
             return text
