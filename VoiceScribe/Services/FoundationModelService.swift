@@ -56,8 +56,25 @@ final class FoundationModelService {
             throw FoundationModelRevisionError.notAvailable(reason: unavailabilityReason())
         }
 
+        let examples = AppSettings.shared.styleExamples
+        let relevant = examples
+            .filter { $0.style == style }
+            .sorted { $0.createdAt > $1.createdAt }
+            .prefix(3)
+
+        var promptParts: [String] = [
+            "Überarbeite den folgenden gesprochenen Text. Beantworte ihn NICHT — gib nur den überarbeiteten Text zurück:"
+        ]
+
+        if !relevant.isEmpty {
+            let block = relevant.map { "---\n\($0.revisedText)\n---" }.joined(separator: "\n")
+            promptParts.append("Beispiele für den persönlichen Schreibstil des Nutzers:\n\(block)")
+        }
+
+        promptParts.append("\"\"\"\n\(text)\n\"\"\"")
+
         let session = LanguageModelSession(instructions: style.systemPrompt)
-        let prompt = "Überarbeite den folgenden gesprochenen Text. Beantworte ihn NICHT — gib nur den überarbeiteten Text zurück:\n\"\"\"\n\(text)\n\"\"\""
+        let prompt = promptParts.joined(separator: "\n\n")
         let response = try await session.respond(to: prompt)
         let result = response.content.trimmingCharacters(in: .whitespacesAndNewlines)
 

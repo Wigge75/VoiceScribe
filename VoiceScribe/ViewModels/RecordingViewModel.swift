@@ -342,6 +342,19 @@ final class RecordingViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Style Examples
+
+    func saveAsStyleExample() {
+        guard case .preview(let text) = state,
+              text.count >= AppSettings.styleExampleMinCharacters else { return }
+
+        let example = StyleExample(
+            style: settings.revisionStyle,
+            revisedText: text
+        )
+        settings.styleExamples.append(example)
+    }
+
     // MARK: - Helpers
 
     private func getAudioDuration(url: URL) async -> Double? {
