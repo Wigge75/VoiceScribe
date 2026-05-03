@@ -76,6 +76,57 @@ final class OllamaService {
         "/opt/homebrew/bin/ollama"
     ]
 
+    // Tracks the server process only when started by this app instance
+    private var serverProcess: Process? = nil
+
+    /// True if the Ollama server was started by this app (and can be stopped by it).
+    var isManagedByApp: Bool { serverProcess != nil }
+
+    // MARK: - Server Lifecycle
+
+    /// Starts `ollama serve` as a background process.
+    /// Returns true if the server is reachable after startup.
+    @discardableResult
+    func startServer() async -> Bool {
+        guard serverProcess == nil else { return await isRunning() }
+
+        guard let binaryPath = ollamaBinaryPaths.first(where: {
+            FileManager.default.isExecutableFile(atPath: $0)
+        }) else { return false }
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: binaryPath)
+        process.arguments = ["serve"]
+        process.environment = [
+            "HOME": NSHomeDirectory(),
+            "PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
+        ]
+        // Discard stdout/stderr so the subprocess doesn't inherit the app's streams
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError  = FileHandle.nullDevice
+
+        process.terminationHandler = { [weak self] _ in
+            self?.serverProcess = nil
+        }
+
+        do {
+            try process.run()
+            serverProcess = process
+        } catch {
+            return false
+        }
+
+        // Give the server ~1.5 seconds to bind its port before checking
+        try? await Task.sleep(for: .milliseconds(1500))
+        return await isRunning()
+    }
+
+    /// Stops the Ollama server if it was started by this app.
+    func stopServer() {
+        serverProcess?.terminate()
+        serverProcess = nil
+    }
+
     // MARK: - Status
 
     func isRunning() async -> Bool {

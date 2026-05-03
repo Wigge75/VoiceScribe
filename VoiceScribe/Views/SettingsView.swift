@@ -103,9 +103,10 @@ private struct ModelsTab: View {
     @EnvironmentObject var settings:  AppSettings
     @EnvironmentObject var viewModel: RecordingViewModel
 
-    @State private var ollamaRunning    = false
-    @State private var ollamaModels:    [String] = []
-    @State private var isLoadingOllama  = false
+    @State private var ollamaRunning      = false
+    @State private var ollamaManagedByApp = false
+    @State private var ollamaModels:      [String] = []
+    @State private var isLoadingOllama    = false
 
     var body: some View {
         Form {
@@ -137,13 +138,18 @@ private struct ModelsTab: View {
                 HStack {
                     Text("Ollama:")
                         .foregroundStyle(.secondary)
-                    Text(ollamaRunning ? "läuft ✓" : "nicht gestartet")
-                        .foregroundColor(ollamaRunning ? .green : .orange)
+                    if ollamaRunning {
+                        Text(ollamaManagedByApp ? "läuft ✓ (App)" : "läuft ✓ (extern)")
+                            .foregroundColor(.green)
+                    } else {
+                        Text("nicht gestartet")
+                            .foregroundColor(.orange)
+                    }
                 }
 
                 if isLoadingOllama {
                     ProgressView("Lade Modell-Liste…")
-                } else if ollamaModels.isEmpty {
+                } else if ollamaModels.isEmpty && ollamaRunning {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Keine Modelle gefunden.")
                             .foregroundStyle(.secondary)
@@ -151,7 +157,7 @@ private struct ModelsTab: View {
                             .font(.system(.caption, design: .monospaced))
                             .foregroundStyle(.secondary)
                     }
-                } else {
+                } else if !ollamaModels.isEmpty {
                     Picker("Modell", selection: $settings.ollamaModel) {
                         ForEach(ollamaModels, id: \.self) { model in
                             Text(model).tag(model)
@@ -159,8 +165,29 @@ private struct ModelsTab: View {
                     }
                 }
 
-                Button("Aktualisieren") { Task { await checkOllama() } }
-                    .buttonStyle(.bordered)
+                HStack(spacing: 8) {
+                    if !ollamaRunning {
+                        Button("Ollama starten") {
+                            Task {
+                                isLoadingOllama = true
+                                await viewModel.ollamaService.startServer()
+                                await checkOllama()
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(.green)
+                    } else if ollamaManagedByApp {
+                        Button("Ollama stoppen") {
+                            viewModel.ollamaService.stopServer()
+                            Task { await checkOllama() }
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(.red)
+                    }
+
+                    Button("Aktualisieren") { Task { await checkOllama() } }
+                        .buttonStyle(.bordered)
+                }
             }
         }
         .formStyle(.grouped)
@@ -170,6 +197,7 @@ private struct ModelsTab: View {
     private func checkOllama() async {
         isLoadingOllama = true
         ollamaRunning = await viewModel.ollamaService.isRunning()
+        ollamaManagedByApp = viewModel.ollamaService.isManagedByApp
         if ollamaRunning {
             ollamaModels = (try? await viewModel.ollamaService.availableModels()) ?? []
         } else {
