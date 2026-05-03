@@ -180,8 +180,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = F6821F58C308AC775B65E742 /* Build configuration list for PBXProject "VoiceScribe" */;
 			developmentRegion = en;
