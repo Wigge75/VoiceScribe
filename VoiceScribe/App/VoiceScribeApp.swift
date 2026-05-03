@@ -91,5 +91,11 @@ struct MenuBarMenuView: View {
             NSApplication.shared.terminate(nil)
         }
         .keyboardShortcut("q", modifiers: .command)
+
+        Divider()
+
+        Text("Version 1.4.0")
+            .foregroundStyle(.secondary)
+            .font(.caption)
     }
 }

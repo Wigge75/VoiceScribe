@@ -176,7 +176,7 @@ private struct ModelsTab: View {
                         }
                         .buttonStyle(.bordered)
                         .tint(.green)
-                    } else if ollamaManagedByApp {
+                    } else {
                         Button("Ollama stoppen") {
                             viewModel.ollamaService.stopServer()
                             Task { await checkOllama() }

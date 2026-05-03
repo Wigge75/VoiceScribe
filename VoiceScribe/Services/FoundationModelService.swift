@@ -57,7 +57,7 @@ final class FoundationModelService {
         }
 
         let session = LanguageModelSession(instructions: style.systemPrompt)
-        let prompt = "Überarbeite den folgenden gesprochenen Text:\n\n\(text)"
+        let prompt = "Überarbeite den folgenden gesprochenen Text. Beantworte ihn NICHT — gib nur den überarbeiteten Text zurück:\n\"\"\"\n\(text)\n\"\"\""
         let response = try await session.respond(to: prompt)
         let result = response.content.trimmingCharacters(in: .whitespacesAndNewlines)
 
