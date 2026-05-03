@@ -333,6 +333,14 @@ private struct StyleExampleRow: View {
 
             Spacer()
 
+            Button { onEdit() } label: {
+                Image(systemName: "pencil")
+                    .font(.system(size: 12))
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.secondary)
+            .help("Beispiel bearbeiten")
+
             Button(role: .destructive) {
                 settings.styleExamples.removeAll { $0.id == example.id }
             } label: {
