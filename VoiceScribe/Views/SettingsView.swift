@@ -22,6 +22,10 @@ struct SettingsView: View {
                 .tabItem { Label("Modelle", systemImage: "cpu") }
                 .environmentObject(settings)
                 .environmentObject(viewModel)
+
+            StylesTab()
+                .tabItem { Label("Stile", systemImage: "bookmark.fill") }
+                .environmentObject(settings)
         }
         .padding()
     }
@@ -229,6 +233,94 @@ private struct WhisperStatusView: View {
             Label("Fehler: \(msg)", systemImage: "xmark.circle")
                 .foregroundColor(.red)
         }
+    }
+}
+
+// MARK: - Styles Tab
+
+private struct StylesTab: View {
+    @EnvironmentObject var settings: AppSettings
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                if settings.styleExamples.isEmpty {
+                    ContentUnavailableView(
+                        "Keine Stilbeispiele",
+                        systemImage: "bookmark.slash",
+                        description: Text("Speichere Beispiele mit \"Stil merken\" im Vorschau-Panel.")
+                    )
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 40)
+                } else {
+                    ForEach(RevisionStyle.allCases) { style in
+                        let examples = settings.styleExamples
+                            .filter { $0.style == style }
+                            .sorted { $0.createdAt > $1.createdAt }
+                        if !examples.isEmpty {
+                            StyleExamplesSection(style: style, examples: examples)
+                                .environmentObject(settings)
+                        }
+                    }
+                }
+            }
+            .padding()
+        }
+        .frame(minHeight: 300)
+    }
+}
+
+private struct StyleExamplesSection: View {
+    @EnvironmentObject var settings: AppSettings
+    let style: RevisionStyle
+    let examples: [StyleExample]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label(style.displayName, systemImage: style.sfSymbol)
+                .font(.headline)
+                .foregroundColor(style.accentColor)
+
+            ForEach(examples) { example in
+                StyleExampleRow(example: example)
+                    .environmentObject(settings)
+            }
+        }
+    }
+}
+
+private struct StyleExampleRow: View {
+    @EnvironmentObject var settings: AppSettings
+    let example: StyleExample
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(example.revisedText)
+                    .font(.system(size: 12))
+                    .lineLimit(3)
+                    .foregroundStyle(.primary)
+
+                Text(example.createdAt.formatted(date: .abbreviated, time: .shortened))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Button(role: .destructive) {
+                settings.styleExamples.removeAll { $0.id == example.id }
+            } label: {
+                Image(systemName: "trash")
+                    .font(.system(size: 12))
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.red)
+            .help("Beispiel löschen")
+        }
+        .padding(10)
+        .background(Color(nsColor: .controlBackgroundColor))
+        .cornerRadius(8)
     }
 }
 

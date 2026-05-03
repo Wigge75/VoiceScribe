@@ -116,6 +116,24 @@ struct RecordingPanelContent: View {
 
                         Spacer()
 
+                        // Stil merken — nur im Überarbeitungs-Modus
+                        if settings.mode == .revision {
+                            Button {
+                                viewModel.saveAsStyleExample()
+                            } label: {
+                                Label("Stil merken", systemImage: "bookmark")
+                                    .font(.system(size: 12))
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                            .disabled(text.count < AppSettings.styleExampleMinCharacters)
+                            .help(
+                                text.count < AppSettings.styleExampleMinCharacters
+                                    ? "Text zu kurz (mind. \(AppSettings.styleExampleMinCharacters) Zeichen)"
+                                    : "Als Stilbeispiel für \"\(settings.revisionStyle.displayName)\" speichern"
+                            )
+                        }
+
                         // Kopieren — Klick oder Enter-Taste
                         Button {
                             viewModel.confirmInsertion()
