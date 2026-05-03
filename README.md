@@ -96,6 +96,23 @@ Auf macOS 26 mit Apple Intelligence ist **kein Setup nötig** — die KI läuft 
 | **Mit Emojis** | Locker mit passenden Emojis |
 | **Entschärfen** | Wütenden oder aggressiven Text in sachlichen Ton umwandeln |
 
+### Persönliche Stilbeispiele (Few-Shot Prompting)
+
+VoiceScribe kann deinen persönlichen Schreibstil lernen — ohne Cloud, ohne Training.
+
+**So funktioniert es:**
+- Überarbeitete Texte als Stilreferenz speichern → die KI orientiert sich beim nächsten Mal daran
+- Bis zu 3 Beispiele pro Stil fließen automatisch in den Prompt ein
+
+**Beispiele verwalten:**
+
+| Aktion | Weg |
+|---|---|
+| Aus Überarbeitung speichern | Preview-Panel → **„Stil merken"** (ab 80 Zeichen) |
+| Manuell eingeben | Einstellungen (⌘,) → **Stile** → **+** beim gewünschten Stil |
+| Bearbeiten | Einstellungen → Stile → **✏️** neben dem Beispiel |
+| Löschen | Einstellungen → Stile → **🗑** neben dem Beispiel |
+
 ---
 
 ## Ollama einrichten (optional, Fallback)
@@ -125,6 +142,7 @@ Den Ollama-Server kannst du direkt in VoiceScribe starten und stoppen:
 | Sprache | Deutsch / Englisch / Auto-Erkennung usw. |
 | Whisper-Modell | Tiny (schnell) bis Medium (genau) |
 | Ollama | Server starten/stoppen, Modell auswählen |
+| Stile | Persönliche Stilbeispiele hinzufügen, bearbeiten und löschen |
 
 ---
 
