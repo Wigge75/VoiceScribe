@@ -23,7 +23,7 @@ enum RecordingMode: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-enum RevisionStyle: String, CaseIterable, Identifiable {
+enum RevisionStyle: String, CaseIterable, Identifiable, Codable {
     case beruflich         = "beruflich"
     case locker            = "locker"
     case mitEmojis         = "mitEmojis"
@@ -134,6 +134,16 @@ final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(revisionStyle.rawValue, forKey: Keys.revisionStyle) }
     }
 
+    @Published var styleExamples: [StyleExample] {
+        didSet {
+            if let data = try? JSONEncoder().encode(styleExamples) {
+                UserDefaults.standard.set(data, forKey: Keys.styleExamples)
+            }
+        }
+    }
+
+    static let styleExampleMinCharacters = 80
+
     private init() {
         let defaults = UserDefaults.standard
         mode = RecordingMode(rawValue: defaults.string(forKey: Keys.mode) ?? "") ?? .dictation
@@ -143,6 +153,12 @@ final class AppSettings: ObservableObject {
         ollamaModel = defaults.string(forKey: Keys.ollamaModel) ?? ""
         language = defaults.string(forKey: Keys.language) ?? "de"
         revisionStyle = RevisionStyle(rawValue: defaults.string(forKey: Keys.revisionStyle) ?? "") ?? .beruflich
+        if let data = defaults.data(forKey: Keys.styleExamples),
+           let decoded = try? JSONDecoder().decode([StyleExample].self, from: data) {
+            styleExamples = decoded
+        } else {
+            styleExamples = []
+        }
     }
 
     private enum Keys {
@@ -151,5 +167,6 @@ final class AppSettings: ObservableObject {
         static let ollamaModel   = "vs_ollamaModel"
         static let language      = "vs_language"
         static let revisionStyle = "vs_revisionStyle"
+        static let styleExamples = "vs_styleExamples"
     }
 }

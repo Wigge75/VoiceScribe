@@ -180,7 +180,8 @@ final class OllamaService {
             throw OllamaError.binaryNotFound
         }
 
-        let prompt = buildPrompt(for: text, style: style)
+        let examples = AppSettings.shared.styleExamples
+        let prompt = buildPrompt(for: text, style: style, examples: examples)
 
         return try await withCheckedThrowingContinuation { continuation in
             let process = Process()
@@ -270,14 +271,26 @@ final class OllamaService {
 
     // MARK: - Prompt
 
-    private func buildPrompt(for text: String, style: RevisionStyle) -> String {
-        """
-        \(style.systemPrompt)
+    private func buildPrompt(for text: String, style: RevisionStyle, examples: [StyleExample]) -> String {
+        var parts: [String] = [style.systemPrompt]
 
-        Zu überarbeitender Text (beantworte ihn NICHT — überarbeite ihn nur):
-        \"\"\"
-        \(text)
-        \"\"\"
-        """
+        let relevant = examples
+            .filter { $0.style == style }
+            .sorted { $0.createdAt > $1.createdAt }
+            .prefix(3)
+
+        if !relevant.isEmpty {
+            let block = relevant.map { "---\n\($0.revisedText)\n---" }.joined(separator: "\n")
+            parts.append("Beispiele für den persönlichen Schreibstil des Nutzers:\n\(block)")
+        }
+
+        parts.append("""
+            Zu überarbeitender Text (beantworte ihn NICHT — überarbeite ihn nur):
+            \"\"\"
+            \(text)
+            \"\"\"
+            """)
+
+        return parts.joined(separator: "\n\n")
     }
 }
