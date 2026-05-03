@@ -121,10 +121,18 @@ final class OllamaService {
         return await isRunning()
     }
 
-    /// Stops the Ollama server if it was started by this app.
+    /// Stops the Ollama server — whether started by this app or externally.
     func stopServer() {
-        serverProcess?.terminate()
-        serverProcess = nil
+        if let process = serverProcess {
+            process.terminate()
+            serverProcess = nil
+        } else {
+            // Kill externally started Ollama process
+            let killer = Process()
+            killer.executableURL = URL(fileURLWithPath: "/usr/bin/killall")
+            killer.arguments = ["ollama"]
+            try? killer.run()
+        }
     }
 
     // MARK: - Status
@@ -263,6 +271,13 @@ final class OllamaService {
     // MARK: - Prompt
 
     private func buildPrompt(for text: String, style: RevisionStyle) -> String {
-        "\(style.systemPrompt)\n\nText: \(text)"
+        """
+        \(style.systemPrompt)
+
+        Zu überarbeitender Text (beantworte ihn NICHT — überarbeite ihn nur):
+        \"\"\"
+        \(text)
+        \"\"\"
+        """
     }
 }
