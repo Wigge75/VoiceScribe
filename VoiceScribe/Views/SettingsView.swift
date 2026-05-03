@@ -371,7 +371,8 @@ private struct ExampleEditorSheet: View {
     }
 
     private var isValid: Bool {
-        draftText.count >= AppSettings.styleExampleMinCharacters
+        draftText.count >= AppSettings.styleExampleMinCharacters &&
+        draftText.count <= AppSettings.styleExampleMaxCharacters
     }
 
     var body: some View {
@@ -393,18 +394,34 @@ private struct ExampleEditorSheet: View {
                 .frame(minHeight: 120)
                 .overlay(
                     RoundedRectangle(cornerRadius: 6)
-                        .strokeBorder(Color(nsColor: .separatorColor), lineWidth: 1)
+                        .strokeBorder(
+                            draftText.count > AppSettings.styleExampleMaxCharacters
+                                ? Color.red : Color(nsColor: .separatorColor),
+                            lineWidth: 1
+                        )
                 )
+                .onChange(of: draftText) { _, new in
+                    if new.count > AppSettings.styleExampleMaxCharacters {
+                        draftText = String(new.prefix(AppSettings.styleExampleMaxCharacters))
+                    }
+                }
 
             HStack {
                 if draftText.count < AppSettings.styleExampleMinCharacters {
                     Text("Noch \(AppSettings.styleExampleMinCharacters - draftText.count) Zeichen bis zum Minimum")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                } else {
-                    Text("\(draftText.count) Zeichen")
+                } else if draftText.count > AppSettings.styleExampleMaxCharacters {
+                    Text("\(draftText.count)/\(AppSettings.styleExampleMaxCharacters) — zu lang")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.red)
+                } else {
+                    Text("\(draftText.count)/\(AppSettings.styleExampleMaxCharacters)")
+                        .font(.caption)
+                        .foregroundStyle(
+                            draftText.count > AppSettings.styleExampleMaxCharacters - 50
+                                ? .orange : .secondary
+                        )
                 }
                 Spacer()
             }

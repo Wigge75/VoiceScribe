@@ -143,6 +143,7 @@ final class AppSettings: ObservableObject {
     }
 
     static let styleExampleMinCharacters = 80
+    static let styleExampleMaxCharacters = 500
 
     private init() {
         let defaults = UserDefaults.standard
