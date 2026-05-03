@@ -238,35 +238,40 @@ private struct WhisperStatusView: View {
 
 // MARK: - Styles Tab
 
+private struct EditorContext: Identifiable {
+    let id = UUID()
+    let style: RevisionStyle
+    let existing: StyleExample?
+}
+
 private struct StylesTab: View {
     @EnvironmentObject var settings: AppSettings
+    @State private var editorContext: EditorContext?
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                if settings.styleExamples.isEmpty {
-                    ContentUnavailableView(
-                        "Keine Stilbeispiele",
-                        systemImage: "bookmark.slash",
-                        description: Text("Speichere Beispiele mit \"Stil merken\" im Vorschau-Panel.")
+                ForEach(RevisionStyle.allCases) { style in
+                    let examples = settings.styleExamples
+                        .filter { $0.style == style }
+                        .sorted { $0.createdAt > $1.createdAt }
+
+                    StyleExamplesSection(
+                        style: style,
+                        examples: examples,
+                        onAdd:  { editorContext = EditorContext(style: style, existing: nil) },
+                        onEdit: { editorContext = EditorContext(style: style, existing: $0) }
                     )
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 40)
-                } else {
-                    ForEach(RevisionStyle.allCases) { style in
-                        let examples = settings.styleExamples
-                            .filter { $0.style == style }
-                            .sorted { $0.createdAt > $1.createdAt }
-                        if !examples.isEmpty {
-                            StyleExamplesSection(style: style, examples: examples)
-                                .environmentObject(settings)
-                        }
-                    }
+                    .environmentObject(settings)
                 }
             }
             .padding()
         }
         .frame(minHeight: 300)
+        .sheet(item: $editorContext) { ctx in
+            ExampleEditorSheet(context: ctx)
+                .environmentObject(settings)
+        }
     }
 }
 
@@ -274,16 +279,35 @@ private struct StyleExamplesSection: View {
     @EnvironmentObject var settings: AppSettings
     let style: RevisionStyle
     let examples: [StyleExample]
+    var onAdd:  () -> Void
+    var onEdit: (StyleExample) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label(style.displayName, systemImage: style.sfSymbol)
-                .font(.headline)
-                .foregroundColor(style.accentColor)
+            HStack {
+                Label(style.displayName, systemImage: style.sfSymbol)
+                    .font(.headline)
+                    .foregroundColor(style.accentColor)
+                Spacer()
+                Button { onAdd() } label: {
+                    Image(systemName: "plus.circle")
+                        .font(.system(size: 15))
+                        .foregroundStyle(style.accentColor)
+                }
+                .buttonStyle(.plain)
+                .help("Neues \(style.displayName)-Beispiel hinzufügen")
+            }
 
-            ForEach(examples) { example in
-                StyleExampleRow(example: example)
-                    .environmentObject(settings)
+            if examples.isEmpty {
+                Text("Noch keine Beispiele.")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                    .padding(.vertical, 4)
+            } else {
+                ForEach(examples) { example in
+                    StyleExampleRow(example: example, onEdit: { onEdit(example) })
+                        .environmentObject(settings)
+                }
             }
         }
     }
@@ -292,6 +316,7 @@ private struct StyleExamplesSection: View {
 private struct StyleExampleRow: View {
     @EnvironmentObject var settings: AppSettings
     let example: StyleExample
+    var onEdit: () -> Void
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -321,6 +346,87 @@ private struct StyleExampleRow: View {
         .padding(10)
         .background(Color(nsColor: .controlBackgroundColor))
         .cornerRadius(8)
+    }
+}
+
+// MARK: - Example Editor Sheet
+
+private struct ExampleEditorSheet: View {
+    @EnvironmentObject var settings: AppSettings
+    @Environment(\.dismiss) private var dismiss
+    let context: EditorContext
+    @State private var draftText: String
+
+    init(context: EditorContext) {
+        self.context = context
+        _draftText = State(initialValue: context.existing?.revisedText ?? "")
+    }
+
+    private var isValid: Bool {
+        draftText.count >= AppSettings.styleExampleMinCharacters
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label(
+                    context.existing == nil
+                        ? "Neues \(context.style.displayName)-Beispiel"
+                        : "\(context.style.displayName)-Beispiel bearbeiten",
+                    systemImage: context.style.sfSymbol
+                )
+                .font(.headline)
+                .foregroundColor(context.style.accentColor)
+                Spacer()
+            }
+
+            TextEditor(text: $draftText)
+                .font(.system(size: 13))
+                .frame(minHeight: 120)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 6)
+                        .strokeBorder(Color(nsColor: .separatorColor), lineWidth: 1)
+                )
+
+            HStack {
+                if draftText.count < AppSettings.styleExampleMinCharacters {
+                    Text("Noch \(AppSettings.styleExampleMinCharacters - draftText.count) Zeichen bis zum Minimum")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("\(draftText.count) Zeichen")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+            }
+
+            HStack {
+                Button("Abbrechen") { dismiss() }
+                    .keyboardShortcut(.cancelAction)
+                Spacer()
+                Button("Speichern") { save(); dismiss() }
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(!isValid)
+            }
+        }
+        .padding(20)
+        .frame(width: 440, height: 240)
+    }
+
+    private func save() {
+        if let existing = context.existing {
+            if let idx = settings.styleExamples.firstIndex(where: { $0.id == existing.id }) {
+                settings.styleExamples[idx] = StyleExample(
+                    id: existing.id,
+                    style: context.style,
+                    revisedText: draftText,
+                    createdAt: existing.createdAt
+                )
+            }
+        } else {
+            settings.styleExamples.append(StyleExample(style: context.style, revisedText: draftText))
+        }
     }
 }
 
