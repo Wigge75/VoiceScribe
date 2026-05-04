@@ -235,6 +235,7 @@ final class RecordingViewModel: ObservableObject {
                 let fileURL = try audioRecorder.startRecording()
                 state = .recording
                 recordingStartTime = Date()
+                NSSound(named: .init("Tink"))?.play()
                 panelController.show(viewModel: self)
                 pendingRecordingURL = fileURL
             } catch {
@@ -254,6 +255,7 @@ final class RecordingViewModel: ObservableObject {
         currentTask?.cancel()
         currentTask = nil
 
+        NSSound(named: .init("Pop"))?.play()
         let fileURL = audioRecorder.stopRecording() ?? pendingRecordingURL
         pendingRecordingURL = nil
 
