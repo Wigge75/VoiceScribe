@@ -11,29 +11,8 @@ struct VoiceScribeApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var viewModel = RecordingViewModel()
 
-    // Dynamic menu bar icon that reflects the current recording state.
-    // SwiftUI re-evaluates this whenever viewModel.state changes.
-    private var menuBarIcon: String {
-        switch viewModel.state {
-        case .recording:
-            return "waveform.circle.fill"
-        case .transcribing, .revising, .inserting:
-            return "ellipsis.circle"
-        case .preview:
-            return "checkmark.circle"
-        case .error:
-            return "exclamationmark.circle"
-        default:
-            return "waveform.circle"
-        }
-    }
-
     var body: some Scene {
-        // The menu bar icon and its dropdown menu.
-        // .menu style renders a standard NSMenu when clicked.
-        // The actual recording UI lives in the floating NSPanel (managed by the ViewModel),
-        // not inside this menu.
-        MenuBarExtra("VoiceScribe", systemImage: menuBarIcon) {
+        MenuBarExtra("VoiceScribe", systemImage: viewModel.menuBarIconName) {
             MenuBarMenuView()
                 .environmentObject(viewModel)
                 .environmentObject(AppSettings.shared)
@@ -94,7 +73,7 @@ struct MenuBarMenuView: View {
 
         Divider()
 
-        Text("Version 1.7.1")
+        Text("Version 1.8.1")
             .foregroundStyle(.secondary)
             .font(.caption)
     }

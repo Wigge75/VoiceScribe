@@ -4,7 +4,6 @@
 
 import SwiftUI
 import KeyboardShortcuts
-import ApplicationServices
 
 struct SettingsView: View {
 
@@ -91,10 +90,6 @@ private struct GeneralTab: View {
                     .foregroundStyle(.secondary)
             }
 
-            // Accessibility permission status
-            Section("Berechtigungen") {
-                AccessibilityStatusRow()
-            }
         }
         .formStyle(.grouped)
     }
@@ -455,38 +450,3 @@ private struct ExampleEditorSheet: View {
     }
 }
 
-// MARK: - Accessibility Status Row
-
-private struct AccessibilityStatusRow: View {
-    @State private var isTrusted = false
-    // Timer fires every 2 s so the status updates automatically after the user
-    // grants permission in System Settings without needing to re-open Settings.
-    private let refreshTimer = Timer.publish(every: 2, on: .main, in: .common).autoconnect()
-
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Bedienungshilfen")
-                Text("Benötigt für direktes Einfügen von Text (Strategie 1). Ohne Erlaubnis wird Zwischenablage + CMD+V verwendet.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            Spacer()
-
-            if isTrusted {
-                Label("Erlaubt", systemImage: "checkmark.circle.fill")
-                    .foregroundColor(.green)
-            } else {
-                Button("Erlauben…") {
-                    let opts = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
-                    AXIsProcessTrustedWithOptions(opts as CFDictionary)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(.orange)
-            }
-        }
-        .onAppear { isTrusted = AXIsProcessTrusted() }
-        .onReceive(refreshTimer) { _ in isTrusted = AXIsProcessTrusted() }
-    }
-}

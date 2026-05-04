@@ -24,19 +24,17 @@ enum RecordingMode: String, CaseIterable, Identifiable {
 }
 
 enum RevisionStyle: String, CaseIterable, Identifiable, Codable {
-    case beruflich         = "beruflich"
-    case locker            = "locker"
-    case mitEmojis         = "mitEmojis"
-    case rageEntschaerfer  = "rageEntschaerfer"
+    case beruflich = "beruflich"
+    case locker    = "locker"
+    case mitEmojis = "mitEmojis"
 
     var id: String { rawValue }
 
     var displayName: String {
         switch self {
-        case .beruflich:        return "Beruflich"
-        case .locker:           return "Locker"
-        case .mitEmojis:        return "Mit Emojis"
-        case .rageEntschaerfer: return "Entschärfen"
+        case .beruflich: return "Beruflich"
+        case .locker:    return "Locker"
+        case .mitEmojis: return "Mit Emojis"
         }
     }
 
@@ -55,32 +53,29 @@ enum RevisionStyle: String, CaseIterable, Identifiable, Codable {
                 """
         case .locker:
             return """
-                Du bist ein Freund, der Sprachnachrichten in lockere, natürliche Textnachrichten umwandelt.
-                Behalte den informellen, freundschaftlichen Ton bei. Schreib wie man wirklich spricht — locker, direkt, menschlich.
-                Leichte Umgangssprache ist erwünscht. Entferne Abbrüche, Wiederholungen und Füllwörter wie „öh", „ähm" und „halt".
+                Du bist ein Textbereiniger für lockere deutsche Sprachnachrichten.
+                Deine Aufgabe ist minimaler Eingriff: Entferne Füllwörter (öh, ähm, halt, also), Abbrüche und Wiederholungen. Gliedere in lesbare Sätze.
+                Verändere keine Sätze die bereits funktionieren.
+                Verwende ausschließlich Wörter und Begriffe die wörtlich gesprochen wurden — keine Synonyme, keine Ergänzungen, keine Interpretationen.
+                Erkenne Gedankenkorrekturen: Wenn der Sprecher abbricht und neu ansetzt („warte", „also eigentlich", „nein"), behalte nur die finale Version des Gedankens.
+                Behalte den informellen Ton des Sprechers bei.
                 Ändere niemals den Inhalt oder die Kernaussage.
                 Antworte IMMER auf Deutsch.
-                Antworte NUR mit dem überarbeiteten Text, ohne Erklärungen oder Anmerkungen.
+                Antworte NUR mit dem überarbeiteten Text, ohne Erklärungen.
                 """
         case .mitEmojis:
             return """
-                Du bist ein Freund, der Sprachnachrichten in lockere, natürliche Textnachrichten mit passenden Emojis umwandelt.
-                Behalte den informellen, freundschaftlichen Ton bei. Schreib wie man wirklich spricht — locker, direkt, menschlich.
-                Leichte Umgangssprache ist erwünscht. Entferne Abbrüche, Wiederholungen und Füllwörter wie „öh", „ähm" und „halt".
-                Füge passende Emojis ein, die den Ton und die Aussage unterstreichen — aber sparsam und sinnvoll, nicht übertrieben.
+                Du bist ein Textbereiniger für lockere deutsche Sprachnachrichten mit Emojis.
+                Deine zwei Aufgaben: (1) Text bereinigen. (2) Emojis einfügen — das ist Pflicht.
+                Beim Bereinigen: Entferne Füllwörter (öh, ähm, halt, also), Abbrüche und Wiederholungen. Gliedere in lesbare Sätze.
+                Verändere keine Sätze die bereits funktionieren.
+                Verwende ausschließlich Wörter und Begriffe die wörtlich gesprochen wurden — keine Synonyme, keine Ergänzungen, keine Interpretationen.
+                Erkenne Gedankenkorrekturen: Wenn der Sprecher abbricht und neu ansetzt („warte", „also eigentlich", „nein"), behalte nur die finale Version des Gedankens.
+                Beim Einfügen von Emojis: Füge dezent 1–2 Emojis pro Absatz ein — maximal eines pro Satz. Platziere sie am Ende eines Satzes. Weniger ist mehr.
+                Behalte den informellen Ton des Sprechers bei.
                 Ändere niemals den Inhalt oder die Kernaussage.
                 Antworte IMMER auf Deutsch.
-                Antworte NUR mit dem überarbeiteten Text, ohne Erklärungen oder Anmerkungen.
-                """
-        case .rageEntschaerfer:
-            return """
-                Du bist ein Kommunikationsberater, der wütende oder aggressive Texte entschärft.
-                Wandle den Text in einen ruhigen, sachlichen und konstruktiven Ton um.
-                Behalte die eigentliche Botschaft und alle konkreten Punkte vollständig bei — ändere nur den emotionalen Tonfall.
-                Entferne Beleidigungen, Drohungen und aggressive Formulierungen sowie Füllwörter wie „öh", „ähm" und „halt".
-                Das Ergebnis soll professionell und lösungsorientiert klingen, ohne den Inhalt zu verwässern.
-                Antworte IMMER auf Deutsch.
-                Antworte NUR mit dem entschärften Text, ohne Erklärungen oder Anmerkungen.
+                Antworte NUR mit dem überarbeiteten Text, ohne Erklärungen.
                 """
         }
     }

@@ -18,7 +18,6 @@ enum RecordingState {
     case transcribing
     case revising
     case preview(text: String)     // Text bereit — Panel ist Key-Window, wartet auf Enter
-    case inserting
     case done(preview: String)
     case error(String)
 }
@@ -52,20 +51,11 @@ final class RecordingViewModel: ObservableObject {
     let audioRecorder  = AudioRecorder()
     let whisperService = WhisperService()
     let ollamaService  = OllamaService()
-    let textInserter   = TextInserter()
 
     private var settings: AppSettings { AppSettings.shared }
     private var panelController = PanelController()
     private var audioCancellable: AnyCancellable?
     private var currentTask: Task<Void, Never>?
-
-    // The app that was frontmost when recording started.
-    private var targetApp: NSRunningApplication?
-
-    // AX-Element das den Cursor enthält — wird ganz am Anfang der Aufnahme gespeichert,
-    // bevor das Panel erscheint. So funktioniert das Einfügen auch dann, wenn das
-    // Panel während der Vorschau den Tastaturfokus übernimmt.
-    private var savedFocusedElement: AXUIElement?
 
     // Suspension point: pipeline wartet hier bis der Nutzer Enter oder Escape drückt.
     private var insertionContinuation: CheckedContinuation<Bool, Never>?
@@ -102,7 +92,6 @@ final class RecordingViewModel: ObservableObject {
         case .transcribing:            return "Transkribiere…"
         case .revising:                return "KI überarbeitet…"
         case .preview:                 return "Bereit zum Einfügen"
-        case .inserting:               return "Füge Text ein…"
         case .done(let preview):       return "Fertig: \"\(preview)\""
         case .error(let msg):          return "Fehler: \(msg)"
         }
@@ -111,7 +100,7 @@ final class RecordingViewModel: ObservableObject {
     var menuBarIconName: String {
         switch state {
         case .recording:                           return "waveform.circle.fill"
-        case .transcribing, .revising, .inserting: return "ellipsis.circle"
+        case .transcribing, .revising: return "ellipsis.circle"
         case .preview:                             return "checkmark.circle"
         case .error:                               return "exclamationmark.circle"
         default:                                   return "waveform.circle"
@@ -161,15 +150,6 @@ final class RecordingViewModel: ObservableObject {
             }
 
             do {
-                // App UND fokussiertes AX-Element sichern, BEVOR das Panel erscheint.
-                // In diesem Moment liegt der Cursor garantiert noch in der Ziel-App.
-                targetApp = NSWorkspace.shared.frontmostApplication
-                if let app = targetApp {
-                    savedFocusedElement = textInserter.captureFocusedElement(
-                        pid: app.processIdentifier
-                    )
-                }
-
                 let fileURL = try audioRecorder.startRecording()
                 state = .recording
                 // orderFront (nicht makeKeyAndOrderFront) — Panel erscheint ohne Fokus zu stehlen
@@ -206,8 +186,6 @@ final class RecordingViewModel: ObservableObject {
     private func pipeline(fileURL: URL) async {
         defer {
             audioRecorder.cleanupTempFile(at: fileURL)
-            savedFocusedElement = nil
-            targetApp = nil
         }
 
         do {
@@ -241,37 +219,42 @@ final class RecordingViewModel: ObservableObject {
                 finalText = await performRevision(of: transcribed)
             }
 
-            // Schritt 3: Vorschau — Text im Panel zeigen, auf Bestätigung warten.
-            // Das Panel wird Key-Window damit Enter/Escape empfangen werden können.
-            // Die Ziel-App bleibt weiterhin die aktive App (vorderste App).
-            state = .preview(text: finalText)
-            panelController.makeKey(
-                onConfirm: { [weak self] in
-                    Task { @MainActor [weak self] in self?.confirmInsertion() }
-                },
-                onCancel: { [weak self] in
-                    Task { @MainActor [weak self] in self?.cancelInsertion() }
-                }
-            )
-
-            let confirmed = await waitForConfirmation()
-
-            panelController.hide()
-
-            guard confirmed else {
-                state = .idle
-                return
-            }
-
-            // Schritt 4: Text in Zwischenablage kopieren.
-            // Der Nutzer fügt ihn mit CMD+V selbst an der gewünschten Stelle ein.
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(finalText, forType: .string)
 
             let preview = String(finalText.prefix(40))
-            state = .done(preview: preview)
-            try? await Task.sleep(nanoseconds: 1_500_000_000)
-            state = .idle
+
+            if settings.mode == .dictation {
+                // Diktat: Auto-Bestätigung — Text ist bereits in der Zwischenablage.
+                // Panel zeigt 1 Sek. lang eine Bestätigung, dann schließt es sich automatisch.
+                state = .done(preview: preview)
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                panelController.hide()
+                state = .idle
+            } else {
+                // Überarbeitung: Vorschau anzeigen, auf Bestätigung warten.
+                state = .preview(text: finalText)
+                panelController.makeKey(
+                    onConfirm: { [weak self] in
+                        Task { @MainActor [weak self] in self?.confirmInsertion() }
+                    },
+                    onCancel: { [weak self] in
+                        Task { @MainActor [weak self] in self?.cancelInsertion() }
+                    }
+                )
+
+                let confirmed = await waitForConfirmation()
+                panelController.hide()
+
+                guard confirmed else {
+                    state = .idle
+                    return
+                }
+
+                state = .done(preview: preview)
+                try? await Task.sleep(nanoseconds: 1_500_000_000)
+                state = .idle
+            }
 
         } catch {
             // Fehler im Panel für 3 s anzeigen, dann ausblenden

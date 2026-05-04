@@ -8,19 +8,17 @@ extension RevisionStyle {
 
     var sfSymbol: String {
         switch self {
-        case .beruflich:        return "briefcase.fill"
-        case .locker:           return "bubble.left.fill"
-        case .mitEmojis:        return "face.smiling.inverse"
-        case .rageEntschaerfer: return "flame.fill"
+        case .beruflich: return "briefcase.fill"
+        case .locker:    return "bubble.left.fill"
+        case .mitEmojis: return "face.smiling.inverse"
         }
     }
 
     var accentColor: Color {
         switch self {
-        case .beruflich:        return .blue
-        case .locker:           return .green
-        case .mitEmojis:        return .orange
-        case .rageEntschaerfer: return .red
+        case .beruflich: return .blue
+        case .locker:    return .green
+        case .mitEmojis: return .orange
         }
     }
 }

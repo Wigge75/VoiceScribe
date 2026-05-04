@@ -249,9 +249,6 @@ final class OllamaService {
                 output = output.trimmingCharacters(in: .whitespacesAndNewlines)
 
                 if output.isEmpty {
-                    let errData = errorPipe.fileHandleForReading.readDataToEndOfFile()
-                    let errMsg  = String(data: errData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-                    print("[OllamaService] stderr: \(errMsg)")
                     finish(with: .failure(OllamaError.emptyResponse))
                 } else {
                     finish(with: .success(output))
