@@ -23,7 +23,7 @@ final class FloatingPanel: NSPanel {
 
     init() {
         super.init(
-            contentRect: NSRect(x: 0, y: 0, width: 400, height: 220),
+            contentRect: NSRect(x: 0, y: 0, width: 400, height: 195),
             styleMask: [.titled, .fullSizeContentView, .nonactivatingPanel],
             backing:   .buffered,
             defer:     false
@@ -95,6 +95,19 @@ final class PanelController {
         panel?.confirmHandler = nil
         panel?.cancelHandler  = nil
         panel?.orderOut(nil)
+    }
+
+    /// Animates the panel to a new height, keeping the top edge fixed.
+    func resize(to height: CGFloat) {
+        guard let p = panel else { return }
+        let current = p.frame
+        let newY = current.maxY - height
+        let newFrame = NSRect(x: current.minX, y: newY, width: current.width, height: height)
+        NSAnimationContext.runAnimationGroup { ctx in
+            ctx.duration = 0.2
+            ctx.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            p.animator().setFrame(newFrame, display: true)
+        }
     }
 
     // MARK: - Positioning

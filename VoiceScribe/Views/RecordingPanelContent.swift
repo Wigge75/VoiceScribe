@@ -16,6 +16,18 @@ struct RecordingPanelContent: View {
 
     @EnvironmentObject var viewModel: RecordingViewModel
     @EnvironmentObject var settings: AppSettings
+    @State private var recordingElapsed: Int = 0
+
+    private var isRecording: Bool {
+        if case .recording = viewModel.state { return true }
+        return false
+    }
+
+    private var elapsedLabel: String {
+        let m = recordingElapsed / 60
+        let s = recordingElapsed % 60
+        return String(format: "%d:%02d", m, s)
+    }
 
     var body: some View {
         ZStack {
@@ -38,6 +50,12 @@ struct RecordingPanelContent: View {
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(.primary)
                         .lineLimit(1)
+
+                    if isRecording {
+                        Text(elapsedLabel)
+                            .font(.system(size: 13, weight: .medium).monospacedDigit())
+                            .foregroundStyle(.secondary)
+                    }
 
                     Spacer()
 
@@ -103,9 +121,16 @@ struct RecordingPanelContent: View {
                     Text(text)
                         .font(.system(size: 12))
                         .foregroundStyle(.primary.opacity(0.85))
-                        .lineLimit(3)
+                        .lineLimit(5)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .transition(.opacity)
+
+                    // Wortanzahl & Zeichenanzahl
+                    let wordCount = text.split(whereSeparator: \.isWhitespace).count
+                    Text("\(wordCount) Wörter · \(text.count) Zeichen")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.tertiary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
                     // Hinweis wenn Überarbeitung fehlschlug (gelber Banner)
                     if let warning = viewModel.revisionWarning {
@@ -170,9 +195,17 @@ struct RecordingPanelContent: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
         }
-        .frame(width: 400, height: 220)
+        .frame(width: 400)
         .background(Color.clear)
         .animation(.easeInOut(duration: 0.2), value: stateLabel)
+        .task(id: isRecording) {
+            guard isRecording else { recordingElapsed = 0; return }
+            recordingElapsed = 0
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                if isRecording { recordingElapsed += 1 }
+            }
+        }
     }
 
     // MARK: - State Indicator

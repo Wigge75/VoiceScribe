@@ -246,6 +246,7 @@ final class RecordingViewModel: ObservableObject {
                 recordingStartTime = Date()
                 NSSound(named: .init("Tink"))?.play()
                 panelController.show(viewModel: self)
+                panelController.resize(to: 195)
                 pendingRecordingURL = fileURL
             } catch {
                 state = .error(error.localizedDescription)
@@ -295,6 +296,7 @@ final class RecordingViewModel: ObservableObject {
 
             // Schritt 1: Transkription
             state = .transcribing
+            panelController.resize(to: 160)
             let language = settings.language == "auto" ? nil : settings.language
             let transcribed = try await whisperService.transcribe(
                 audioPath: fileURL.path,
@@ -313,6 +315,7 @@ final class RecordingViewModel: ObservableObject {
             // Schritt 2 (optional): Überarbeitung
             if settings.mode == .revision {
                 state = .revising
+                panelController.resize(to: 160)
                 finalText = await performRevision(of: transcribed)
             }
 
@@ -331,6 +334,7 @@ final class RecordingViewModel: ObservableObject {
             } else {
                 // Überarbeitung: Vorschau anzeigen, auf Bestätigung warten.
                 state = .preview(text: finalText)
+                panelController.resize(to: 270)
                 panelController.makeKey(
                     onConfirm: { [weak self] in
                         Task { @MainActor [weak self] in self?.confirmInsertion() }

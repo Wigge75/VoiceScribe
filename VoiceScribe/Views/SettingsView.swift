@@ -91,6 +91,13 @@ private struct GeneralTab: View {
                 Text("Aufnahme stoppt automatisch nach der gewählten Stille-Dauer. Standard: 1,5 Sek.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+
+                Label(
+                    "Endet die Aufnahme zu früh? Sehr leise Sprache kann als Stille erkannt werden — näher ans Mikrofon sprechen oder eine längere Stille-Dauer wählen.",
+                    systemImage: "info.circle"
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
             }
 
             // Language
