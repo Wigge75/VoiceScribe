@@ -61,9 +61,10 @@ final class RecordingViewModel: ObservableObject {
     // Suspension point: pipeline wartet hier bis der Nutzer Enter oder Escape drückt.
     private var insertionContinuation: CheckedContinuation<Bool, Never>?
 
-    private var silenceStart:       Date? = nil
-    private var recordingStartTime: Date? = nil
-    private var loudStart:          Date? = nil
+    private var recordingStartTime:      Date? = nil
+    private var silencePhaseStart:       Date? = nil   // Beginn der aktuellen Stille-Phase
+    private var silenceAccumulatedTime:  TimeInterval = 0  // Stille über mehrere Phasen summiert
+    private var loudStart:               Date? = nil
 
     // MARK: - Init
 
@@ -167,7 +168,8 @@ final class RecordingViewModel: ObservableObject {
     }
 
     func forceAbort() { // called from panel abort button
-        silenceStart = nil
+        silencePhaseStart = nil
+        silenceAccumulatedTime = 0
         recordingStartTime = nil
         loudStart = nil
         currentTask?.cancel()
@@ -177,28 +179,35 @@ final class RecordingViewModel: ObservableObject {
     }
 
     private func checkSilence(_ level: AudioLevel) {
-        guard case .recording = state else { silenceStart = nil; loudStart = nil; return }
+        guard case .recording = state else { silencePhaseStart = nil; silenceAccumulatedTime = 0; loudStart = nil; return }
         guard settings.silenceTimeout != .off else { return }
         guard let startTime = recordingStartTime,
               Date().timeIntervalSince(startTime) >= 1.0 else { return }
 
         if level.averageDB < -40.0 {
-            // Silent frame: reset loud tracker, advance silence timer
+            // Stille-Phase: akkumulierte Zeit vorantreiben
             loudStart = nil
-            if silenceStart == nil {
-                silenceStart = Date()
-            } else if Date().timeIntervalSince(silenceStart!) >= settings.silenceTimeout.rawValue {
-                silenceStart = nil
+            if silencePhaseStart == nil { silencePhaseStart = Date() }
+            let total = silenceAccumulatedTime + Date().timeIntervalSince(silencePhaseStart!)
+            if total >= settings.silenceTimeout.rawValue {
+                silencePhaseStart = nil
+                silenceAccumulatedTime = 0
                 recordingStartTime = nil
                 loudStart = nil
                 stopAndProcess()
             }
         } else {
-            // Loud frame: only reset silence timer after 0.4s of sustained noise
+            // Geräusch-Phase: akkumulierte Stille einfrieren
+            if let phaseStart = silencePhaseStart {
+                silenceAccumulatedTime += Date().timeIntervalSince(phaseStart)
+                silencePhaseStart = nil
+            }
             if loudStart == nil {
                 loudStart = Date()
             } else if Date().timeIntervalSince(loudStart!) >= 0.4 {
-                silenceStart = nil
+                // 0,4s anhaltende Sprache → Stille komplett zurücksetzen
+                silenceAccumulatedTime = 0
+                loudStart = Date()
             }
         }
     }
@@ -249,7 +258,8 @@ final class RecordingViewModel: ObservableObject {
     // MARK: - Recording Stop + Pipeline
 
     private func stopAndProcess() {
-        silenceStart = nil
+        silencePhaseStart = nil
+        silenceAccumulatedTime = 0
         recordingStartTime = nil
         loudStart = nil
         currentTask?.cancel()
