@@ -53,6 +53,26 @@ struct RecordingPanelContent: View {
                         .buttonStyle(.plain)
                         .help("Aufnahme stoppen")
                     }
+
+                    // Abort button during transcribing / revising
+                    if case .transcribing = viewModel.state {
+                        Button { viewModel.forceAbort() } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 22))
+                                .foregroundColor(.red)
+                        }
+                        .buttonStyle(.plain)
+                        .help("Abbrechen")
+                    }
+                    if case .revising = viewModel.state {
+                        Button { viewModel.forceAbort() } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 22))
+                                .foregroundColor(.red)
+                        }
+                        .buttonStyle(.plain)
+                        .help("Abbrechen")
+                    }
                 }
 
                 // ── Style-Picker (nur im Überarbeitungs-Modus) ─────────

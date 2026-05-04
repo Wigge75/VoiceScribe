@@ -114,11 +114,19 @@ final class RecordingViewModel: ObservableObject {
         case .idle, .done, .error:
             startRecording()
         case .preview:
-            // Tastenkürzel wirkt als "Abbrechen" in der Vorschau
             cancelInsertion()
+        case .transcribing, .revising:
+            forceAbort()
         default:
             break
         }
+    }
+
+    func forceAbort() { // called from panel abort button
+        currentTask?.cancel()
+        currentTask = nil
+        panelController.hide()
+        state = .idle
     }
 
     // MARK: - Preview Confirmation
