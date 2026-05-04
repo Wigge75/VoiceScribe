@@ -2,8 +2,8 @@
 
 Lokale Sprach-Diktiersoftware für macOS als Menu-Bar-App.
 
-- **Diktat-Modus**: Sprache → Whisper → Text direkt eingefügt
-- **Überarbeitungs-Modus**: Sprache → Whisper → KI verfeinert → Text eingefügt
+- **Diktat-Modus**: Sprache → Whisper → Text in Zwischenablage
+- **Überarbeitungs-Modus**: Sprache → Whisper → KI verfeinert → Text in Zwischenablage
 - Vollständig offline nach dem ersten Modell-Download
 - Kein Cloud-Dienst, keine Datenübertragung
 
@@ -42,13 +42,7 @@ In Xcode: **Signing & Capabilities** → Team auswählen → **Cmd+R**
 
 ## Berechtigungen beim ersten Start
 
-**Mikrofon**: Wird einmalig beim ersten Drücken des Tastenkürzel angefragt.
-
-**Bedienungshilfen** (für direktes Text-Einfügen):
-1. Systemeinstellungen → **Datenschutz & Sicherheit** → **Bedienungshilfen**
-2. **VoiceScribe** in der Liste aktivieren
-
-Alternativ: Einstellungen (⌘,) → Tab „Allgemein" → „Erlauben…"-Button.
+**Mikrofon**: Wird einmalig beim ersten Drücken des Tastenkürzel angefragt. Keine weiteren Berechtigungen nötig.
 
 ---
 
@@ -58,21 +52,44 @@ Alternativ: Einstellungen (⌘,) → Tab „Allgemein" → „Erlauben…"-Butto
 
 | Aktion | Standard-Kürzel |
 |---|---|
-| Aufnahme starten/stoppen | **⌥Space** (Option + Leertaste) |
+| Aufnahme starten/stoppen | **⌥Space** |
+| Modus wechseln (Diktat ↔ Überarbeiten) | **⌥0** |
+| Stil: Beruflich | **⌥1** |
+| Stil: Locker | **⌥2** |
+| Stil: Mit Emojis | **⌥3** |
 | Einstellungen öffnen | **⌘,** |
 
-Das Tastenkürzel ist in den Einstellungen frei konfigurierbar.
+Alle Tastenkürzel sind in den Einstellungen frei konfigurierbar.  
+Die Stil-Shortcuts (⌥1/⌥2/⌥3) wechseln automatisch in den Überarbeitungs-Modus.
 
 ### Ablauf
 
-1. Cursor in ein Textfeld setzen (z. B. Mail, Slack, Browser, TextEdit)
-2. **⌥Space** drücken → Panel erscheint
-3. Sprechen
-4. **⌥Space** nochmals drücken → Text wird transkribiert und eingefügt
+**Diktat:**
+1. **⌥Space** drücken → Panel erscheint
+2. Sprechen
+3. Aufnahme stoppt automatisch nach Stille — oder **⌥Space** nochmals drücken
+4. Text landet sofort in der Zwischenablage
+
+**Überarbeitung:**
+1. **⌥Space** drücken → Panel erscheint
+2. Sprechen
+3. Aufnahme stoppt automatisch nach Stille — oder **⌥Space** nochmals drücken
+4. KI überarbeitet den Text im gewählten Stil
+5. Vorschau erscheint im Panel → **↩ Kopieren** oder **Verwerfen**
+
+### Auto-Stopp nach Stille
+
+Die Aufnahme stoppt automatisch wenn du aufgehört hast zu sprechen. Die Stille-Dauer ist konfigurierbar (Aus / 1 / 1,5 / 2 / 3 / 5 Sek., Standard: 1,5 Sek.).
+
+Kurze Umgebungsgeräusche (Stuhlknarzen, Tippen) unterbrechen den Timer nicht.
 
 ### Modus wechseln
 
-Im Menüleisten-Icon klicken → **Diktat** oder **Überarbeiten** auswählen.
+- **Tastenkürzel**: ⌥0 togglet zwischen Diktat und Überarbeiten
+- **Menüleiste**: VoiceScribe-Icon klicken → Modus auswählen
+- **Einstellungen**: ⌘, → Tab „Allgemein"
+
+Bei jedem Wechsel per Tastenkürzel erscheint kurz ein Icon-Overlay zur Bestätigung.
 
 ---
 
@@ -89,12 +106,11 @@ Auf macOS 26 mit Apple Intelligence ist **kein Setup nötig** — die KI läuft 
 
 ### Überarbeitungs-Stile
 
-| Stil | Beschreibung |
-|---|---|
-| **Beruflich** | Klares, strukturiertes Schriftdeutsch für Teams, E-Mails, Berichte |
-| **Locker** | Natürliche Textnachricht, informell und direkt |
-| **Mit Emojis** | Locker mit passenden Emojis |
-| **Entschärfen** | Wütenden oder aggressiven Text in sachlichen Ton umwandeln |
+| Stil | Kürzel | Beschreibung |
+|---|---|---|
+| **Beruflich** | ⌥1 | Klares, strukturiertes Schriftdeutsch für Teams, E-Mails, Berichte |
+| **Locker** | ⌥2 | Natürliche Textnachricht, informell und direkt |
+| **Mit Emojis** | ⌥3 | Locker mit passenden Emojis |
 
 ### Persönliche Stilbeispiele (Few-Shot Prompting)
 
@@ -136,9 +152,10 @@ Den Ollama-Server kannst du direkt in VoiceScribe starten und stoppen:
 
 | Einstellung | Beschreibung |
 |---|---|
-| Tastenkürzel | Globales Hotkey für Aufnahme |
+| Tastenkürzel | Globales Hotkey für Aufnahme + Stil/Modus-Shortcuts |
 | Modus | Diktat oder Überarbeiten |
-| Standard-Stil | Beruflich / Locker / Mit Emojis / Entschärfen |
+| Standard-Stil | Beruflich / Locker / Mit Emojis |
+| Auto-Stopp | Stille-Dauer für automatisches Aufnahme-Ende |
 | Sprache | Deutsch / Englisch / Auto-Erkennung usw. |
 | Whisper-Modell | Tiny (schnell) bis Medium (genau) |
 | Ollama | Server starten/stoppen, Modell auswählen |
@@ -164,9 +181,6 @@ Danach vollständig offline.
 
 ## Fehlerbehebung
 
-### Text wird nicht eingefügt
-→ Bedienungshilfen-Berechtigung prüfen: Systemeinstellungen → Datenschutz & Sicherheit → Bedienungshilfen
-
 ### „Ollama läuft nicht"
 → Einstellungen (⌘,) → Tab „Modelle" → „Ollama starten" klicken  
 → Oder Terminal: `ollama serve`
@@ -175,7 +189,7 @@ Danach vollständig offline.
 → Internetverbindung beim ersten Start erforderlich. Danach vollständig offline.
 
 ### App erscheint nicht in der Menüleiste
-→ App neu starten. Bei Installation aus Xcode: App läuft im DerivedData-Ordner.
+→ App neu starten.
 
 ---
 
