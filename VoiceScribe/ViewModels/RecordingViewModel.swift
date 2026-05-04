@@ -51,6 +51,7 @@ final class RecordingViewModel: ObservableObject {
     let audioRecorder  = AudioRecorder()
     let whisperService = WhisperService()
     let ollamaService  = OllamaService()
+    let hud            = HUDController()
 
     private var settings: AppSettings { AppSettings.shared }
     private var panelController = PanelController()
@@ -84,7 +85,10 @@ final class RecordingViewModel: ObservableObject {
         KeyboardShortcuts.onKeyDown(for: .toggleMode) { [weak self] in
             Task { @MainActor [weak self] in
                 guard let self else { return }
-                AppSettings.shared.mode = AppSettings.shared.mode == .dictation ? .revision : .dictation
+                let newMode: RecordingMode = AppSettings.shared.mode == .dictation ? .revision : .dictation
+                AppSettings.shared.mode = newMode
+                let icon = newMode == .dictation ? "mic.fill" : "doc.on.clipboard.fill"
+                hud.show(icon: icon)
             }
         }
 
@@ -93,6 +97,7 @@ final class RecordingViewModel: ObservableObject {
                 guard let self else { return }
                 AppSettings.shared.revisionStyle = .beruflich
                 AppSettings.shared.mode = .revision
+                hud.show(icon: RevisionStyle.beruflich.sfSymbol)
             }
         }
         KeyboardShortcuts.onKeyDown(for: .selectStyleLocker) { [weak self] in
@@ -100,6 +105,7 @@ final class RecordingViewModel: ObservableObject {
                 guard let self else { return }
                 AppSettings.shared.revisionStyle = .locker
                 AppSettings.shared.mode = .revision
+                hud.show(icon: RevisionStyle.locker.sfSymbol)
             }
         }
         KeyboardShortcuts.onKeyDown(for: .selectStyleMitEmojis) { [weak self] in
@@ -107,6 +113,7 @@ final class RecordingViewModel: ObservableObject {
                 guard let self else { return }
                 AppSettings.shared.revisionStyle = .mitEmojis
                 AppSettings.shared.mode = .revision
+                hud.show(icon: RevisionStyle.mitEmojis.sfSymbol)
             }
         }
 
