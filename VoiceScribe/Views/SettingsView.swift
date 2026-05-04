@@ -43,6 +43,7 @@ private struct GeneralTab: View {
             Section("Tastenkürzel") {
                 KeyboardShortcuts.Recorder("Aufnahme starten / stoppen:", name: .toggleRecording)
                     .help("Drücke eine Tastenkombination. Die Standard-Kombination ist ⌥Space.")
+                KeyboardShortcuts.Recorder("Modus wechseln (⌥0):", name: .toggleMode)
                 KeyboardShortcuts.Recorder("Stil: Beruflich (⌥1):", name: .selectStyleBeruflich)
                 KeyboardShortcuts.Recorder("Stil: Locker (⌥2):", name: .selectStyleLocker)
                 KeyboardShortcuts.Recorder("Stil: Mit Emojis (⌥3):", name: .selectStyleMitEmojis)
