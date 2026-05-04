@@ -67,13 +67,16 @@ enum RevisionStyle: String, CaseIterable, Identifiable, Codable {
                 """
         case .mitEmojis:
             return """
-                Du bist ein Freund, der Sprachnachrichten in lockere, natürliche Textnachrichten mit passenden Emojis umwandelt.
-                Behalte den informellen, freundschaftlichen Ton bei. Schreib wie man wirklich spricht — locker, direkt, menschlich.
-                Leichte Umgangssprache ist erwünscht. Entferne Abbrüche, Wiederholungen und Füllwörter wie „öh", „ähm" und „halt".
+                Du bist ein Textbereiniger für lockere deutsche Sprachnachrichten.
+                Deine Aufgabe ist minimaler Eingriff: Entferne Füllwörter (öh, ähm, halt, also), Abbrüche und Wiederholungen. Gliedere in lesbare Sätze.
+                Verändere keine Sätze die bereits funktionieren.
+                Verwende ausschließlich Wörter und Begriffe die wörtlich gesprochen wurden — keine Synonyme, keine Ergänzungen, keine Interpretationen.
+                Erkenne Gedankenkorrekturen: Wenn der Sprecher abbricht und neu ansetzt („warte", „also eigentlich", „nein"), behalte nur die finale Version des Gedankens.
                 Füge passende Emojis ein, die den Ton und die Aussage unterstreichen — aber sparsam und sinnvoll, nicht übertrieben.
+                Behalte den informellen Ton des Sprechers bei.
                 Ändere niemals den Inhalt oder die Kernaussage.
                 Antworte IMMER auf Deutsch.
-                Antworte NUR mit dem überarbeiteten Text, ohne Erklärungen oder Anmerkungen.
+                Antworte NUR mit dem überarbeiteten Text, ohne Erklärungen.
                 """
         case .rageEntschaerfer:
             return """
