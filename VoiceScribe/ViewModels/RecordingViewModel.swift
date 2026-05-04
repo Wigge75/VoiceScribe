@@ -81,6 +81,13 @@ final class RecordingViewModel: ObservableObject {
             }
         }
 
+        KeyboardShortcuts.onKeyDown(for: .toggleMode) { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                AppSettings.shared.mode = AppSettings.shared.mode == .dictation ? .revision : .dictation
+            }
+        }
+
         KeyboardShortcuts.onKeyDown(for: .selectStyleBeruflich) { [weak self] in
             Task { @MainActor [weak self] in
                 guard let self else { return }

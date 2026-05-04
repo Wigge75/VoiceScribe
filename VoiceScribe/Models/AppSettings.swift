@@ -9,7 +9,8 @@ import KeyboardShortcuts
 // Must be defined at file scope (top-level), not inside a struct or class.
 // Default shortcut: Option + Space
 extension KeyboardShortcuts.Name {
-    static let toggleRecording   = Self("toggleRecording",   default: .init(.space, modifiers: [.option]))
+    static let toggleRecording      = Self("toggleRecording",      default: .init(.space, modifiers: [.option]))
+    static let toggleMode           = Self("toggleMode",           default: .init(.zero,  modifiers: [.option]))
     static let selectStyleBeruflich = Self("selectStyleBeruflich", default: .init(.one,   modifiers: [.option]))
     static let selectStyleLocker    = Self("selectStyleLocker",    default: .init(.two,   modifiers: [.option]))
     static let selectStyleMitEmojis = Self("selectStyleMitEmojis", default: .init(.three, modifiers: [.option]))
