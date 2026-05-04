@@ -16,7 +16,6 @@
 		6D74D383032C2CF625109A38 /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDFABD47D23EDBF2D3075093 /* AudioRecorder.swift */; };
 		77E25B0721C0900A08E37E85 /* StyleExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636AE1BFBC04BADD59C2352E /* StyleExample.swift */; };
 		867143A26C9B262A22EFD474 /* RevisionStyle+UI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94867E4C3045A2CBAC5F0A22 /* RevisionStyle+UI.swift */; };
-		988CC78B941CFFDBFD55E582 /* TextInserter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA62872333E3B243E6DC48E8 /* TextInserter.swift */; };
 		99E9AC5026F3BEF77FBBA990 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D9986D7A29195C77A8B1A44 /* AppSettings.swift */; };
 		A6AD68F1018BD0B936A58D6C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5AC7B98B7B6DAA5A3F813A7 /* Assets.xcassets */; };
 		AB4525BDAC73C8B5E0804775 /* OllamaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6D6E93C4C367E7710DBE3FF /* OllamaService.swift */; };
@@ -39,7 +38,6 @@
 		8D63D2DFCDD892BDF1B73FB0 /* WaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformView.swift; sourceTree = "<group>"; };
 		94867E4C3045A2CBAC5F0A22 /* RevisionStyle+UI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RevisionStyle+UI.swift"; sourceTree = "<group>"; };
 		B5AC7B98B7B6DAA5A3F813A7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		BA62872333E3B243E6DC48E8 /* TextInserter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInserter.swift; sourceTree = "<group>"; };
 		BDFABD47D23EDBF2D3075093 /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
 		C56A34445E325BD7E7D522A8 /* VoiceScribe.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VoiceScribe.entitlements; sourceTree = "<group>"; };
 		CFC52EB50DE55BCE37D53DE7 /* VoiceScribe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VoiceScribe.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -91,7 +89,6 @@
 				BDFABD47D23EDBF2D3075093 /* AudioRecorder.swift */,
 				601C21271656CC3CA72CCC83 /* FoundationModelService.swift */,
 				D6D6E93C4C367E7710DBE3FF /* OllamaService.swift */,
-				BA62872333E3B243E6DC48E8 /* TextInserter.swift */,
 				549FCC40B7CDC6D76786CEE5 /* WhisperService.swift */,
 			);
 			path = Services;
@@ -236,7 +233,6 @@
 				867143A26C9B262A22EFD474 /* RevisionStyle+UI.swift in Sources */,
 				CCD8D072B737B2F38B15E025 /* SettingsView.swift in Sources */,
 				77E25B0721C0900A08E37E85 /* StyleExample.swift in Sources */,
-				988CC78B941CFFDBFD55E582 /* TextInserter.swift in Sources */,
 				44DD0198279F8BA2DFB761D2 /* VoiceScribeApp.swift in Sources */,
 				F08E062D03534D46CD61E8B1 /* WaveformView.swift in Sources */,
 				581C1AB71D16E61866D27CF3 /* WhisperService.swift in Sources */,

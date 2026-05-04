@@ -171,9 +171,6 @@ struct RecordingPanelContent: View {
         case .preview:
             Image(systemName: "checkmark.circle.fill")
                 .foregroundColor(.green)
-        case .inserting:
-            Image(systemName: "text.cursor")
-                .foregroundColor(.green)
         case .done:
             Image(systemName: "checkmark.circle.fill")
                 .foregroundColor(.green)
@@ -194,7 +191,6 @@ struct RecordingPanelContent: View {
         case .transcribing:          return "Transkribiere…"
         case .revising:              return "KI überarbeitet…"
         case .preview:               return "Ergebnis — ↩ Kopieren"
-        case .inserting:             return "Text wird eingefügt…"
         case .done(let preview):     return "✓ \(preview.prefix(30))…"
         case .error(let msg):        return "Fehler: \(msg)"
         }
