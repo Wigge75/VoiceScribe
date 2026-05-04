@@ -65,17 +65,17 @@ Die Stil-Shortcuts (⌥1/⌥2/⌥3) wechseln automatisch in den Überarbeitungs-
 ### Ablauf
 
 **Diktat:**
-1. **⌥Space** drücken → Panel erscheint
-2. Sprechen
-3. Aufnahme stoppt automatisch nach Stille — oder **⌥Space** nochmals drücken
+1. **⌥Space** drücken → Panel erscheint, Aufnahme-Timer startet
+2. Sprechen — ein kurzer Ton bestätigt den Start
+3. Aufnahme stoppt automatisch nach Stille — oder **⌥Space** nochmals drücken (Stopp-Ton)
 4. Text landet sofort in der Zwischenablage
 
 **Überarbeitung:**
-1. **⌥Space** drücken → Panel erscheint
-2. Sprechen
-3. Aufnahme stoppt automatisch nach Stille — oder **⌥Space** nochmals drücken
+1. **⌥Space** drücken → Panel erscheint, Aufnahme-Timer startet
+2. Sprechen — ein kurzer Ton bestätigt den Start
+3. Aufnahme stoppt automatisch nach Stille — oder **⌥Space** nochmals drücken (Stopp-Ton)
 4. KI überarbeitet den Text im gewählten Stil
-5. Vorschau erscheint im Panel → **↩ Kopieren** oder **Verwerfen**
+5. Vorschau erscheint im Panel mit Wort- und Zeichenanzahl → **↩ Kopieren** oder **Verwerfen**
 
 ### Auto-Stopp nach Stille
 
