@@ -99,6 +99,28 @@ enum WhisperModelSize: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
+enum SilenceTimeout: Double, CaseIterable, Identifiable {
+    case off          = 0
+    case one          = 1.0
+    case onePointFive = 1.5
+    case two          = 2.0
+    case three        = 3.0
+    case five         = 5.0
+
+    var id: Double { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .off:          return "Aus"
+        case .one:          return "1 Sek."
+        case .onePointFive: return "1,5 Sek."
+        case .two:          return "2 Sek."
+        case .three:        return "3 Sek."
+        case .five:         return "5 Sek."
+        }
+    }
+}
+
 // MARK: - AppSettings
 
 /// Singleton holding all user-configurable settings.
@@ -125,6 +147,10 @@ final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(language, forKey: Keys.language) }
     }
 
+    @Published var silenceTimeout: SilenceTimeout {
+        didSet { UserDefaults.standard.set(silenceTimeout.rawValue, forKey: Keys.silenceTimeout) }
+    }
+
     @Published var revisionStyle: RevisionStyle {
         didSet { UserDefaults.standard.set(revisionStyle.rawValue, forKey: Keys.revisionStyle) }
     }
@@ -148,6 +174,7 @@ final class AppSettings: ObservableObject {
         // Ein leerer String führt zu einer verständlichen Fehlermeldung statt Timeout.
         ollamaModel = defaults.string(forKey: Keys.ollamaModel) ?? ""
         language = defaults.string(forKey: Keys.language) ?? "de"
+        silenceTimeout = SilenceTimeout(rawValue: defaults.double(forKey: Keys.silenceTimeout)) ?? .onePointFive
         revisionStyle = RevisionStyle(rawValue: defaults.string(forKey: Keys.revisionStyle) ?? "") ?? .beruflich
         if let data = defaults.data(forKey: Keys.styleExamples),
            let decoded = try? JSONDecoder().decode([StyleExample].self, from: data) {
@@ -162,7 +189,8 @@ final class AppSettings: ObservableObject {
         static let whisperModel  = "vs_whisperModel"
         static let ollamaModel   = "vs_ollamaModel"
         static let language      = "vs_language"
-        static let revisionStyle = "vs_revisionStyle"
+        static let silenceTimeout = "vs_silenceTimeout"
+        static let revisionStyle  = "vs_revisionStyle"
         static let styleExamples = "vs_styleExamples"
     }
 }
