@@ -10,7 +10,7 @@ extension RevisionStyle {
         switch self {
         case .beruflich: return "briefcase.fill"
         case .locker:    return "bubble.left.fill"
-        case .mitEmojis: return "face.smiling.inverse"
+        case .mitEmojis: return "face.smiling.fill"
         }
     }
 

@@ -14,6 +14,7 @@
 		581C1AB71D16E61866D27CF3 /* WhisperService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 549FCC40B7CDC6D76786CEE5 /* WhisperService.swift */; };
 		5E05C8A1263E899C7FE0F85A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43888034F056F1C8451D27E /* AppDelegate.swift */; };
 		6D74D383032C2CF625109A38 /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDFABD47D23EDBF2D3075093 /* AudioRecorder.swift */; };
+		6E34390B170556A5A53B06DE /* HUDController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75B933648E95737B0CFD681 /* HUDController.swift */; };
 		77E25B0721C0900A08E37E85 /* StyleExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636AE1BFBC04BADD59C2352E /* StyleExample.swift */; };
 		867143A26C9B262A22EFD474 /* RevisionStyle+UI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94867E4C3045A2CBAC5F0A22 /* RevisionStyle+UI.swift */; };
 		99E9AC5026F3BEF77FBBA990 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D9986D7A29195C77A8B1A44 /* AppSettings.swift */; };
@@ -42,6 +43,7 @@
 		C56A34445E325BD7E7D522A8 /* VoiceScribe.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VoiceScribe.entitlements; sourceTree = "<group>"; };
 		CFC52EB50DE55BCE37D53DE7 /* VoiceScribe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VoiceScribe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6D6E93C4C367E7710DBE3FF /* OllamaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaService.swift; sourceTree = "<group>"; };
+		E75B933648E95737B0CFD681 /* HUDController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUDController.swift; sourceTree = "<group>"; };
 		EDED3A77B6F75367CE0F14BC /* VoiceScribeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceScribeApp.swift; sourceTree = "<group>"; };
 		F43888034F056F1C8451D27E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FB9D6BA49DCF61516C11C041 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -122,6 +124,7 @@
 		B3164C8DCF9BFDE3F6779C1D /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				E75B933648E95737B0CFD681 /* HUDController.swift */,
 				388EDEFFB5E4A88AAE4A021F /* RecordingPanel.swift */,
 				6BB51DCB0D33B17EEDBDC31D /* RecordingPanelContent.swift */,
 				94867E4C3045A2CBAC5F0A22 /* RevisionStyle+UI.swift */,
@@ -226,6 +229,7 @@
 				99E9AC5026F3BEF77FBBA990 /* AppSettings.swift in Sources */,
 				6D74D383032C2CF625109A38 /* AudioRecorder.swift in Sources */,
 				C1DAD61193A97DB855B0F158 /* FoundationModelService.swift in Sources */,
+				6E34390B170556A5A53B06DE /* HUDController.swift in Sources */,
 				AB4525BDAC73C8B5E0804775 /* OllamaService.swift in Sources */,
 				CA6B3B029F280B73975C9864 /* RecordingPanel.swift in Sources */,
 				132F6D88A4A3E8D34F896F24 /* RecordingPanelContent.swift in Sources */,
