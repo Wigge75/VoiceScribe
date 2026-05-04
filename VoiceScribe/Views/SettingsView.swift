@@ -71,6 +71,20 @@ private struct GeneralTab: View {
                 }
             }
 
+            // Auto-Stop
+            Section("Auto-Stopp") {
+                Picker("Stopp nach Stille", selection: $settings.silenceTimeout) {
+                    ForEach(SilenceTimeout.allCases) { timeout in
+                        Text(timeout.displayName).tag(timeout)
+                    }
+                }
+                .pickerStyle(.menu)
+
+                Text("Aufnahme stoppt automatisch nach der gewählten Stille-Dauer. Standard: 1,5 Sek.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             // Language
             Section("Sprache") {
                 Picker("Transkriptions-Sprache", selection: $settings.language) {

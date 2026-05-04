@@ -60,12 +60,20 @@ final class RecordingViewModel: ObservableObject {
     // Suspension point: pipeline wartet hier bis der Nutzer Enter oder Escape drückt.
     private var insertionContinuation: CheckedContinuation<Bool, Never>?
 
+    private var silenceStart:       Date? = nil
+    private var recordingStartTime: Date? = nil
+    private var loudStart:          Date? = nil
+
     // MARK: - Init
 
     init() {
         audioCancellable = audioRecorder.$audioLevel
             .receive(on: RunLoop.main)
-            .assign(to: \.audioLevel, on: self)
+            .sink { [weak self] level in
+                guard let self else { return }
+                self.audioLevel = level
+                self.checkSilence(level)
+            }
 
         KeyboardShortcuts.onKeyDown(for: .toggleRecording) { [weak self] in
             Task { @MainActor [weak self] in
@@ -123,10 +131,40 @@ final class RecordingViewModel: ObservableObject {
     }
 
     func forceAbort() { // called from panel abort button
+        silenceStart = nil
+        recordingStartTime = nil
+        loudStart = nil
         currentTask?.cancel()
         currentTask = nil
         panelController.hide()
         state = .idle
+    }
+
+    private func checkSilence(_ level: AudioLevel) {
+        guard case .recording = state else { silenceStart = nil; loudStart = nil; return }
+        guard settings.silenceTimeout != .off else { return }
+        guard let startTime = recordingStartTime,
+              Date().timeIntervalSince(startTime) >= 1.0 else { return }
+
+        if level.averageDB < -40.0 {
+            // Silent frame: reset loud tracker, advance silence timer
+            loudStart = nil
+            if silenceStart == nil {
+                silenceStart = Date()
+            } else if Date().timeIntervalSince(silenceStart!) >= settings.silenceTimeout.rawValue {
+                silenceStart = nil
+                recordingStartTime = nil
+                loudStart = nil
+                stopAndProcess()
+            }
+        } else {
+            // Loud frame: only reset silence timer after 0.4s of sustained noise
+            if loudStart == nil {
+                loudStart = Date()
+            } else if Date().timeIntervalSince(loudStart!) >= 0.4 {
+                silenceStart = nil
+            }
+        }
     }
 
     // MARK: - Preview Confirmation
@@ -160,7 +198,7 @@ final class RecordingViewModel: ObservableObject {
             do {
                 let fileURL = try audioRecorder.startRecording()
                 state = .recording
-                // orderFront (nicht makeKeyAndOrderFront) — Panel erscheint ohne Fokus zu stehlen
+                recordingStartTime = Date()
                 panelController.show(viewModel: self)
                 pendingRecordingURL = fileURL
             } catch {
@@ -174,6 +212,9 @@ final class RecordingViewModel: ObservableObject {
     // MARK: - Recording Stop + Pipeline
 
     private func stopAndProcess() {
+        silenceStart = nil
+        recordingStartTime = nil
+        loudStart = nil
         currentTask?.cancel()
         currentTask = nil
 
