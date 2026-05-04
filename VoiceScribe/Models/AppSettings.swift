@@ -24,19 +24,17 @@ enum RecordingMode: String, CaseIterable, Identifiable {
 }
 
 enum RevisionStyle: String, CaseIterable, Identifiable, Codable {
-    case beruflich         = "beruflich"
-    case locker            = "locker"
-    case mitEmojis         = "mitEmojis"
-    case rageEntschaerfer  = "rageEntschaerfer"
+    case beruflich = "beruflich"
+    case locker    = "locker"
+    case mitEmojis = "mitEmojis"
 
     var id: String { rawValue }
 
     var displayName: String {
         switch self {
-        case .beruflich:        return "Beruflich"
-        case .locker:           return "Locker"
-        case .mitEmojis:        return "Mit Emojis"
-        case .rageEntschaerfer: return "Entschärfen"
+        case .beruflich: return "Beruflich"
+        case .locker:    return "Locker"
+        case .mitEmojis: return "Mit Emojis"
         }
     }
 
@@ -78,16 +76,6 @@ enum RevisionStyle: String, CaseIterable, Identifiable, Codable {
                 Ändere niemals den Inhalt oder die Kernaussage.
                 Antworte IMMER auf Deutsch.
                 Antworte NUR mit dem überarbeiteten Text, ohne Erklärungen.
-                """
-        case .rageEntschaerfer:
-            return """
-                Du bist ein Kommunikationsberater, der wütende oder aggressive Texte entschärft.
-                Wandle den Text in einen ruhigen, sachlichen und konstruktiven Ton um.
-                Behalte die eigentliche Botschaft und alle konkreten Punkte vollständig bei — ändere nur den emotionalen Tonfall.
-                Entferne Beleidigungen, Drohungen und aggressive Formulierungen sowie Füllwörter wie „öh", „ähm" und „halt".
-                Das Ergebnis soll professionell und lösungsorientiert klingen, ohne den Inhalt zu verwässern.
-                Antworte IMMER auf Deutsch.
-                Antworte NUR mit dem entschärften Text, ohne Erklärungen oder Anmerkungen.
                 """
         }
     }
