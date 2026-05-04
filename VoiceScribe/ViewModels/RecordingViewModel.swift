@@ -81,6 +81,28 @@ final class RecordingViewModel: ObservableObject {
             }
         }
 
+        KeyboardShortcuts.onKeyDown(for: .selectStyleBeruflich) { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                AppSettings.shared.revisionStyle = .beruflich
+                AppSettings.shared.mode = .revision
+            }
+        }
+        KeyboardShortcuts.onKeyDown(for: .selectStyleLocker) { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                AppSettings.shared.revisionStyle = .locker
+                AppSettings.shared.mode = .revision
+            }
+        }
+        KeyboardShortcuts.onKeyDown(for: .selectStyleMitEmojis) { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                AppSettings.shared.revisionStyle = .mitEmojis
+                AppSettings.shared.mode = .revision
+            }
+        }
+
         Task {
             await whisperService.loadModel(settings.whisperModel.rawValue)
         }
