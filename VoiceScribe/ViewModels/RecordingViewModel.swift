@@ -322,6 +322,17 @@ final class RecordingViewModel: ObservableObject {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(finalText, forType: .string)
 
+            let historyMode  = settings.mode
+            let historyStyle = settings.mode == .revision ? settings.revisionStyle : nil
+            Task {
+                await HistoryService.shared.append(HistoryEntry(
+                    mode:       historyMode,
+                    style:      historyStyle,
+                    transcript: transcribed,
+                    result:     finalText
+                ))
+            }
+
             let preview = String(finalText.prefix(40))
 
             if settings.mode == .dictation {

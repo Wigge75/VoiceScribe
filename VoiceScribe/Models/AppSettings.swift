@@ -18,7 +18,7 @@ extension KeyboardShortcuts.Name {
 
 // MARK: - Enums
 
-enum RecordingMode: String, CaseIterable, Identifiable {
+enum RecordingMode: String, CaseIterable, Identifiable, Codable {
     case dictation = "Diktat"
     case revision  = "Überarbeiten"
     var id: String { rawValue }
