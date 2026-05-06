@@ -73,7 +73,7 @@ struct MenuBarMenuView: View {
 
         Divider()
 
-        Text("Version 1.9.5")
+        Text("Version \(AppSettings.appVersion)")
             .foregroundStyle(.secondary)
             .font(.caption)
     }
