@@ -2,18 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- App Sandbox is DISABLED for direct distribution (non-App Store).
-         This is required because CGEvent.post() to other apps needs
-         Accessibility permission granted by the user in System Settings,
-         which only works reliably outside the sandbox. -->
+    <!-- Sandbox aktiviert: erforderlich für Apple Intelligence (FoundationModels). -->
     <key>com.apple.security.app-sandbox</key>
-    <false/>
+    <true/>
 
-    <!-- Microphone access (required even without sandbox under Hardened Runtime) -->
+    <!-- Mikrofon-Zugriff für Aufnahme -->
     <key>com.apple.security.device.audio-input</key>
     <true/>
 
-    <!-- Outgoing network connections for Ollama on localhost:11434 -->
+    <!-- Netzwerkzugriff: WhisperKit lädt Modelle von HuggingFace beim ersten Start -->
     <key>com.apple.security.network.client</key>
     <true/>
 </dict>

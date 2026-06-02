@@ -4,10 +4,8 @@
 // States:
 //   recording    — pulsierender roter Punkt + Wellenform
 //   transcribing — Ladekreis
-//   revising     — Sparkles-Icon (Ollama läuft)
-//   preview      — fertiger Text + "↩ Einfügen" / "Verwerfen"-Buttons
-//   inserting    — Cursor-Icon
-//   done         — grüner Haken
+//   revising     — Sparkles-Icon (Apple Intelligence läuft)
+//   done         — grüner Haken + Text-Preview
 //   error        — Warnsymbol + Meldung (3 s sichtbar)
 
 import SwiftUI
@@ -115,82 +113,6 @@ struct RecordingPanelContent: View {
                         .transition(.opacity)
                 }
 
-                // ── Preview: Text + Aktions-Buttons ────────────────────
-                if case .preview(let text) = viewModel.state {
-                    // Vorschau-Text
-                    Text(text)
-                        .font(.system(size: 12))
-                        .foregroundStyle(.primary.opacity(0.85))
-                        .lineLimit(5)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .transition(.opacity)
-
-                    // Wortanzahl & Zeichenanzahl
-                    let wordCount = text.split(whereSeparator: \.isWhitespace).count
-                    Text("\(wordCount) Wörter · \(text.count) Zeichen")
-                        .font(.system(size: 10))
-                        .foregroundStyle(.tertiary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                    // Hinweis wenn Überarbeitung fehlschlug (gelber Banner)
-                    if let warning = viewModel.revisionWarning {
-                        HStack(spacing: 6) {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundStyle(.yellow)
-                                .font(.system(size: 11))
-                            Text(warning.message)
-                                .font(.system(size: 11))
-                                .foregroundStyle(.secondary)
-                                .lineLimit(2)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .transition(.opacity)
-                    }
-
-                    // Buttons
-                    HStack {
-                        // Verwerfen — Escape
-                        Button(role: .cancel) {
-                            viewModel.cancelInsertion()
-                        } label: {
-                            Text("Verwerfen")
-                                .font(.system(size: 12))
-                        }
-                        .buttonStyle(.plain)
-                        .foregroundStyle(.secondary)
-
-                        Spacer()
-
-                        // Stil merken — nur im Überarbeitungs-Modus
-                        if settings.mode == .revision {
-                            Button {
-                                viewModel.saveAsStyleExample()
-                            } label: {
-                                Label("Stil merken", systemImage: "bookmark")
-                                    .font(.system(size: 12))
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .disabled(text.count < AppSettings.styleExampleMinCharacters)
-                            .help(
-                                text.count < AppSettings.styleExampleMinCharacters
-                                    ? "Text zu kurz (mind. \(AppSettings.styleExampleMinCharacters) Zeichen)"
-                                    : "Als Stilbeispiel für \"\(settings.revisionStyle.displayName)\" speichern"
-                            )
-                        }
-
-                        // Kopieren — Klick oder Enter-Taste
-                        Button {
-                            viewModel.confirmInsertion()
-                        } label: {
-                            Label("Kopieren", systemImage: "doc.on.clipboard")
-                                .font(.system(size: 12, weight: .medium))
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.small)
-                    }
-                    .transition(.opacity)
-                }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
@@ -221,9 +143,6 @@ struct RecordingPanelContent: View {
         case .revising:
             Image(systemName: AppSettings.shared.revisionStyle.sfSymbol)
                 .foregroundColor(AppSettings.shared.revisionStyle.accentColor)
-        case .preview:
-            Image(systemName: "checkmark.circle.fill")
-                .foregroundColor(.green)
         case .done:
             Image(systemName: "checkmark.circle.fill")
                 .foregroundColor(.green)
@@ -243,7 +162,6 @@ struct RecordingPanelContent: View {
         case .recording:             return "Aufnahme läuft…"
         case .transcribing:          return "Transkribiere…"
         case .revising:              return "KI überarbeitet…"
-        case .preview:               return "Ergebnis — ↩ Kopieren"
         case .done(let preview):     return "✓ \(preview.prefix(30))…"
         case .error(let msg):        return "Fehler: \(msg)"
         }

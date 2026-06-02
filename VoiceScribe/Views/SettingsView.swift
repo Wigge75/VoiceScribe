@@ -1,6 +1,6 @@
 // SettingsView.swift
 // Settings window opened via Cmd+, or from the menu bar dropdown.
-// Two tabs: General (hotkey, mode, language) and Models (Whisper + Ollama).
+// Two tabs: General (hotkey, mode, language) and Models (Whisper + Apple Intelligence).
 
 import SwiftUI
 import KeyboardShortcuts
@@ -131,14 +131,8 @@ private struct ModelsTab: View {
     @EnvironmentObject var settings:  AppSettings
     @EnvironmentObject var viewModel: RecordingViewModel
 
-    @State private var ollamaRunning      = false
-    @State private var ollamaManagedByApp = false
-    @State private var ollamaModels:      [String] = []
-    @State private var isLoadingOllama    = false
-
     var body: some View {
         Form {
-            // Whisper Model
             Section("Whisper-Modell (Transkription)") {
                 Picker("Modell", selection: $settings.whisperModel) {
                     ForEach(WhisperModelSize.allCases) { model in
@@ -161,77 +155,15 @@ private struct ModelsTab: View {
                     .foregroundStyle(.secondary)
             }
 
-            // Ollama Model
-            Section("Ollama-Modell (Überarbeitungs-Modus)") {
-                HStack {
-                    Text("Ollama:")
-                        .foregroundStyle(.secondary)
-                    if ollamaRunning {
-                        Text(ollamaManagedByApp ? "läuft ✓ (App)" : "läuft ✓ (extern)")
-                            .foregroundColor(.green)
-                    } else {
-                        Text("nicht gestartet")
-                            .foregroundColor(.orange)
-                    }
-                }
-
-                if isLoadingOllama {
-                    ProgressView("Lade Modell-Liste…")
-                } else if ollamaModels.isEmpty && ollamaRunning {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Keine Modelle gefunden.")
-                            .foregroundStyle(.secondary)
-                        Text("Terminal: ollama pull mistral")
-                            .font(.system(.caption, design: .monospaced))
-                            .foregroundStyle(.secondary)
-                    }
-                } else if !ollamaModels.isEmpty {
-                    Picker("Modell", selection: $settings.ollamaModel) {
-                        ForEach(ollamaModels, id: \.self) { model in
-                            Text(model).tag(model)
-                        }
-                    }
-                }
-
-                HStack(spacing: 8) {
-                    if !ollamaRunning {
-                        Button("Ollama starten") {
-                            Task {
-                                isLoadingOllama = true
-                                await viewModel.ollamaService.startServer()
-                                await checkOllama()
-                            }
-                        }
-                        .buttonStyle(.bordered)
-                        .tint(.green)
-                    } else {
-                        Button("Ollama stoppen") {
-                            viewModel.ollamaService.stopServer()
-                            Task { await checkOllama() }
-                        }
-                        .buttonStyle(.bordered)
-                        .tint(.red)
-                    }
-
-                    Button("Aktualisieren") { Task { await checkOllama() } }
-                        .buttonStyle(.bordered)
-                }
+            Section("Überarbeitungs-Modus") {
+                Label("Apple Intelligence (On-Device)", systemImage: "apple.intelligence")
+                    .foregroundStyle(.primary)
+                Text("Läuft vollständig lokal auf dem Neural Engine. Kein Server, keine Installation erforderlich.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)
-        .task { await checkOllama() }
-    }
-
-    private func checkOllama() async {
-        isLoadingOllama = true
-        ollamaRunning = await viewModel.ollamaService.isRunning()
-        ollamaManagedByApp = viewModel.ollamaService.isManagedByApp
-        if ollamaRunning {
-            ollamaModels = (try? await viewModel.ollamaService.availableModels()) ?? []
-        } else {
-            ollamaModels = []
-        }
-        isLoadingOllama = false
     }
 }
 

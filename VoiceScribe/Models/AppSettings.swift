@@ -152,7 +152,7 @@ enum SilenceTimeout: Double, CaseIterable, Identifiable {
 /// Persists to UserDefaults and notifies observers via Combine.
 final class AppSettings: ObservableObject {
 
-    static let appVersion = "1.9.6"
+    static let appVersion = "1.9.8"
 
     static let shared = AppSettings()
 
@@ -162,10 +162,6 @@ final class AppSettings: ObservableObject {
 
     @Published var whisperModel: WhisperModelSize {
         didSet { UserDefaults.standard.set(whisperModel.rawValue, forKey: Keys.whisperModel) }
-    }
-
-    @Published var ollamaModel: String {
-        didSet { UserDefaults.standard.set(ollamaModel, forKey: Keys.ollamaModel) }
     }
 
     /// ISO 639-1 language code for Whisper transcription.
@@ -197,9 +193,6 @@ final class AppSettings: ObservableObject {
         let defaults = UserDefaults.standard
         mode = RecordingMode(rawValue: defaults.string(forKey: Keys.mode) ?? "") ?? .dictation
         whisperModel = WhisperModelSize(rawValue: defaults.string(forKey: Keys.whisperModel) ?? "") ?? .small
-        // Kein Default-Modell — der Nutzer wählt in Einstellungen → Modelle.
-        // Ein leerer String führt zu einer verständlichen Fehlermeldung statt Timeout.
-        ollamaModel = defaults.string(forKey: Keys.ollamaModel) ?? ""
         language = defaults.string(forKey: Keys.language) ?? "de"
         silenceTimeout = SilenceTimeout(rawValue: defaults.double(forKey: Keys.silenceTimeout)) ?? .onePointFive
         revisionStyle = RevisionStyle(rawValue: defaults.string(forKey: Keys.revisionStyle) ?? "") ?? .beruflich
@@ -212,12 +205,11 @@ final class AppSettings: ObservableObject {
     }
 
     private enum Keys {
-        static let mode          = "vs_mode"
-        static let whisperModel  = "vs_whisperModel"
-        static let ollamaModel   = "vs_ollamaModel"
-        static let language      = "vs_language"
+        static let mode           = "vs_mode"
+        static let whisperModel   = "vs_whisperModel"
+        static let language       = "vs_language"
         static let silenceTimeout = "vs_silenceTimeout"
         static let revisionStyle  = "vs_revisionStyle"
-        static let styleExamples = "vs_styleExamples"
+        static let styleExamples  = "vs_styleExamples"
     }
 }
