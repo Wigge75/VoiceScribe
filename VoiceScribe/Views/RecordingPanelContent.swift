@@ -4,10 +4,8 @@
 // States:
 //   recording    — pulsierender roter Punkt + Wellenform
 //   transcribing — Ladekreis
-//   revising     — Sparkles-Icon (Ollama läuft)
-//   preview      — fertiger Text + "↩ Einfügen" / "Verwerfen"-Buttons
-//   inserting    — Cursor-Icon
-//   done         — grüner Haken
+//   revising     — Sparkles-Icon (Apple Intelligence läuft)
+//   done         — grüner Haken + Text-Preview
 //   error        — Warnsymbol + Meldung (3 s sichtbar)
 
 import SwiftUI

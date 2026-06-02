@@ -6,7 +6,6 @@
 import Foundation
 import AVFoundation
 import AppKit
-import ApplicationServices
 import Combine
 import KeyboardShortcuts
 
@@ -33,7 +32,6 @@ final class RecordingViewModel: ObservableObject {
     // Services — all created once and reused
     let audioRecorder  = AudioRecorder()
     let whisperService = WhisperService()
-    let ollamaService  = OllamaService()
     let hud            = HUDController()
 
     private var settings: AppSettings { AppSettings.shared }
@@ -276,13 +274,15 @@ final class RecordingViewModel: ObservableObject {
             var finalText = transcribed
             var didRevise = false
 
-            // Schritt 2 (optional): Überarbeitung
+            // Schritt 2 (optional): Überarbeitung mit Apple Intelligence
             if capturedMode == .revision {
                 state = .revising
                 panelController.resize(to: 160)
-                let result = await performRevision(of: transcribed)
-                finalText  = result.revised
-                didRevise  = result.didRevise
+                if #available(macOS 26, *) {
+                    let result = await performRevision(of: transcribed)
+                    finalText = result.revised
+                    didRevise = result.didRevise
+                }
             }
 
             NSPasteboard.general.clearContents()
@@ -323,53 +323,20 @@ final class RecordingViewModel: ObservableObject {
 
     // MARK: - Revision
 
-    // Versucht den Text zu überarbeiten. Gibt immer einen String zurück —
-    // entweder den überarbeiteten Text oder das Original als Fallback.
-    // Gibt zusätzlich zurück ob die Überarbeitung tatsächlich stattgefunden hat.
+    // Überarbeitet Text mit Apple Intelligence (On-Device, kein Setup nötig).
+    // Gibt (revised, didRevise) zurück — bei Fehler wird der Originaltext zurückgegeben.
+    @available(macOS 26, *)
     private func performRevision(of text: String) async -> (revised: String, didRevise: Bool) {
-        let style = settings.revisionStyle
-
-        // Bevorzugter Weg: Apple Intelligence (On-Device, kein Setup nötig)
-        if #available(macOS 26, *) {
-            let service = FoundationModelService()
-            if service.isAvailable() {
-                do {
-                    let result = try await service.revise(text: text, style: style)
-                    return (result, true)
-                } catch {
-                    print("[VoiceScribe] Apple Intelligence Fehler: \(error)")
-                    return (text, false)
-                }
-            } else {
-                print("[VoiceScribe] Apple Intelligence nicht verfügbar: \(service.unavailabilityReason())")
-            }
-
-            // Fallback: Ollama (wenn installiert und Modell gewählt)
-            if await ollamaService.isRunning(), !settings.ollamaModel.isEmpty {
-                do {
-                    let result = try await ollamaService.revise(text: text, model: settings.ollamaModel, style: style)
-                    return (result, true)
-                } catch {
-                    print("[VoiceScribe] Ollama Fehler: \(error)")
-                    return (text, false)
-                }
-            } else {
-                print("[VoiceScribe] Ollama nicht verfügbar oder kein Modell gewählt")
-            }
-
-            return (text, false)
-        }
-
-        // macOS < 26: nur Ollama als Option
-        guard await ollamaService.isRunning(), !settings.ollamaModel.isEmpty else {
-            print("[VoiceScribe] Ollama nicht verfügbar (macOS < 26)")
+        let service = FoundationModelService()
+        guard service.isAvailable() else {
+            print("[VoiceScribe] Apple Intelligence nicht verfügbar: \(service.unavailabilityReason())")
             return (text, false)
         }
         do {
-            let result = try await ollamaService.revise(text: text, model: settings.ollamaModel, style: style)
+            let result = try await service.revise(text: text, style: settings.revisionStyle)
             return (result, true)
         } catch {
-            print("[VoiceScribe] Ollama Fehler: \(error)")
+            print("[VoiceScribe] Apple Intelligence Fehler: \(error)")
             return (text, false)
         }
     }

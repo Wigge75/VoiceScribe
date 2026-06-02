@@ -1,7 +1,6 @@
 // FoundationModelService.swift
 // Text-Überarbeitung mit Apples On-Device-KI (FoundationModels, macOS 26+).
 // Läuft vollständig lokal auf dem Neural Engine — kein Server, keine Installation.
-// Fallback auf OllamaService wenn Apple Intelligence nicht verfügbar ist.
 
 import Foundation
 import FoundationModels
