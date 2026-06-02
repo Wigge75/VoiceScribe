@@ -152,7 +152,7 @@ enum SilenceTimeout: Double, CaseIterable, Identifiable {
 /// Persists to UserDefaults and notifies observers via Combine.
 final class AppSettings: ObservableObject {
 
-    static let appVersion = "1.9.7"
+    static let appVersion = "1.9.8"
 
     static let shared = AppSettings()
 
