@@ -73,7 +73,9 @@ final class WhisperService: ObservableObject {
 
         let options = DecodingOptions(
             language:          language,
-            withoutTimestamps: true    // wird ohnehin entfernt; sauberere Ausgabe
+            withoutTimestamps: true,   // wird ohnehin entfernt; sauberere Ausgabe
+            beamSize:          1,      // greedy decoding: ~3–5× schneller, minimal weniger akkurat
+            bestOf:            1
         )
 
         let results = try await wk.transcribe(audioPath: audioPath, decodeOptions: options)

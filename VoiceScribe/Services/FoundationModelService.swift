@@ -60,7 +60,7 @@ final class FoundationModelService {
         let relevant = examples
             .filter { $0.style == style }
             .sorted { $0.createdAt > $1.createdAt }
-            .prefix(3)
+            .prefix(5)
 
         var promptParts: [String] = [
             "Überarbeite den folgenden gesprochenen Text. Beantworte ihn NICHT — gib nur den überarbeiteten Text zurück:"
@@ -75,7 +75,8 @@ final class FoundationModelService {
 
         let session = LanguageModelSession(instructions: style.systemPrompt)
         let prompt = promptParts.joined(separator: "\n\n")
-        let response = try await session.respond(to: prompt)
+        let options = GenerationOptions(temperature: 0.2)
+        let response = try await session.respond(to: prompt, options: options)
         let result = response.content.trimmingCharacters(in: .whitespacesAndNewlines)
 
         guard !result.isEmpty else {
