@@ -10,7 +10,8 @@ import WhisperKit
 
 enum WhisperLoadState: Equatable {
     case idle
-    case loading
+    case downloading(progress: Double)   // 0.0–1.0, HuggingFace-Download
+    case compiling                       // CoreML-Spezialisierung (kein Fortschritt verfügbar)
     case ready
     case failed(String)
 }
@@ -46,7 +47,7 @@ final class WhisperService: ObservableObject {
     func loadModel(_ modelName: String) async {
         guard loadState != .ready || loadedModelName != modelName else { return }
 
-        loadState = .loading
+        loadState = .downloading(progress: 0)
         loadedModelName = modelName
 
         do {
@@ -56,7 +57,28 @@ final class WhisperService: ObservableObject {
             let downloadBase = FileManager.default
                 .urls(for: .cachesDirectory, in: .userDomainMask)[0]
             let config = WhisperKitConfig(model: modelName, downloadBase: downloadBase)
-            whisperKit = try await WhisperKit(config)
+
+            let wk = try await WhisperKit(config)
+
+            // modelStateCallback liefert Download- und Kompilierungs-Fortschritt
+            wk.modelStateCallback = { [weak self] _, newState in
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+                    switch newState {
+                    case .downloading:
+                        let p = wk.progress.fractionCompleted
+                        self.loadState = .downloading(progress: p)
+                    case .downloaded, .loading, .prewarming, .prewarmed:
+                        self.loadState = .compiling
+                    case .loaded:
+                        self.loadState = .ready
+                    default:
+                        break
+                    }
+                }
+            }
+
+            whisperKit = wk
             loadState = .ready
         } catch {
             loadState = .failed(error.localizedDescription)
