@@ -39,10 +39,11 @@ final class RecordingViewModel: ObservableObject {
     private var audioCancellable: AnyCancellable?
     private var currentTask: Task<Void, Never>?
 
-    private var recordingStartTime:      Date? = nil
-    private var silencePhaseStart:       Date? = nil   // Beginn der aktuellen Stille-Phase
-    private var silenceAccumulatedTime:  TimeInterval = 0  // Stille über mehrere Phasen summiert
-    private var loudStart:               Date? = nil
+    private var pendingRecordingURL: URL?
+    private var recordingStartTime:     Date? = nil
+    private var silencePhaseStart:      Date? = nil
+    private var silenceAccumulatedTime: TimeInterval = 0
+    private var loudStart:              Date? = nil
 
     // MARK: - Init
 
@@ -79,6 +80,7 @@ final class RecordingViewModel: ObservableObject {
                 hud.show(icon: RevisionStyle.beruflich.sfSymbol)
             }
         }
+
         KeyboardShortcuts.onKeyDown(for: .selectStyleLocker) { [weak self] in
             Task { @MainActor [weak self] in
                 guard let self else { return }
@@ -87,6 +89,7 @@ final class RecordingViewModel: ObservableObject {
                 hud.show(icon: RevisionStyle.locker.sfSymbol)
             }
         }
+
         KeyboardShortcuts.onKeyDown(for: .selectStyleMitEmojis) { [weak self] in
             Task { @MainActor [weak self] in
                 guard let self else { return }
@@ -110,12 +113,12 @@ final class RecordingViewModel: ObservableObject {
 
     var statusSummary: String {
         switch state {
-        case .idle:                    return "Bereit (⌥Space)"
-        case .recording:               return "Aufnahme läuft…"
-        case .transcribing:            return "Transkribiere…"
-        case .revising:                return "KI überarbeitet…"
-        case .done(let preview):       return "Fertig: \"\(preview)\""
-        case .error(let msg):          return "Fehler: \(msg)"
+        case .idle:              return "Bereit (⌥Space)"
+        case .recording:         return "Aufnahme läuft…"
+        case .transcribing:      return "Transkribiere…"
+        case .revising:          return "KI überarbeitet…"
+        case .done(let preview): return "Fertig: \"\(preview)\""
+        case .error(let msg):    return "Fehler: \(msg)"
         }
     }
 
@@ -139,7 +142,7 @@ final class RecordingViewModel: ObservableObject {
         }
     }
 
-    func forceAbort() { // called from panel abort button
+    func forceAbort() {
         silencePhaseStart = nil
         silenceAccumulatedTime = 0
         recordingStartTime = nil
@@ -150,14 +153,24 @@ final class RecordingViewModel: ObservableObject {
         state = .idle
     }
 
+    func reloadWhisperModel() {
+        Task { await whisperService.loadModel(settings.whisperModel.rawValue) }
+    }
+
+    // MARK: - Silence Detection
+
     private func checkSilence(_ level: AudioLevel) {
-        guard case .recording = state else { silencePhaseStart = nil; silenceAccumulatedTime = 0; loudStart = nil; return }
+        guard case .recording = state else {
+            silencePhaseStart = nil
+            silenceAccumulatedTime = 0
+            loudStart = nil
+            return
+        }
         guard settings.silenceTimeout != .off else { return }
         guard let startTime = recordingStartTime,
               Date().timeIntervalSince(startTime) >= 1.0 else { return }
 
         if level.averageDB < -40.0 {
-            // Stille-Phase: akkumulierte Zeit vorantreiben
             loudStart = nil
             if silencePhaseStart == nil { silencePhaseStart = Date() }
             let total = silenceAccumulatedTime + Date().timeIntervalSince(silencePhaseStart!)
@@ -169,7 +182,6 @@ final class RecordingViewModel: ObservableObject {
                 stopAndProcess()
             }
         } else {
-            // Geräusch-Phase: akkumulierte Stille einfrieren
             if let phaseStart = silencePhaseStart {
                 silenceAccumulatedTime += Date().timeIntervalSince(phaseStart)
                 silencePhaseStart = nil
@@ -177,18 +189,13 @@ final class RecordingViewModel: ObservableObject {
             if loudStart == nil {
                 loudStart = Date()
             } else if Date().timeIntervalSince(loudStart!) >= 0.4 {
-                // 0,4s anhaltende Sprache → Stille komplett zurücksetzen
                 silenceAccumulatedTime = 0
                 loudStart = Date()
             }
         }
     }
 
-    func reloadWhisperModel() {
-        Task { await whisperService.loadModel(settings.whisperModel.rawValue) }
-    }
-
-    // MARK: - Recording Start
+    // MARK: - Recording
 
     private func startRecording() {
         currentTask = Task {
@@ -197,7 +204,6 @@ final class RecordingViewModel: ObservableObject {
                 state = .error("Kein Mikrofon-Zugriff")
                 return
             }
-
             do {
                 let fileURL = try audioRecorder.startRecording()
                 state = .recording
@@ -211,10 +217,6 @@ final class RecordingViewModel: ObservableObject {
             }
         }
     }
-
-    private var pendingRecordingURL: URL?
-
-    // MARK: - Recording Stop + Pipeline
 
     private func stopAndProcess() {
         silencePhaseStart = nil
@@ -239,20 +241,20 @@ final class RecordingViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Pipeline
+
     private func pipeline(fileURL: URL) async {
         defer {
             audioRecorder.cleanupTempFile(at: fileURL)
         }
 
         do {
-            // Guard: sehr kurze Aufnahmen überspringen (Whisper halluziniert bei Stille)
             if let duration = await getAudioDuration(url: fileURL), duration < 0.5 {
                 state = .idle
                 panelController.hide()
                 return
             }
 
-            // Schritt 1: Transkription
             state = .transcribing
             panelController.resize(to: 160)
             let language = settings.language == "auto" ? nil : settings.language
@@ -267,14 +269,12 @@ final class RecordingViewModel: ObservableObject {
                 return
             }
 
-            // Mode und Style jetzt festhalten, bevor async-Operationen beginnen
             let capturedMode  = settings.mode
             let capturedStyle = settings.revisionStyle
 
             var finalText = transcribed
             var didRevise = false
 
-            // Schritt 2 (optional): Überarbeitung mit Apple Intelligence
             if capturedMode == .revision {
                 state = .revising
                 panelController.resize(to: 160)
@@ -288,24 +288,20 @@ final class RecordingViewModel: ObservableObject {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(finalText, forType: .string)
 
-            let historyStyle = capturedMode == .revision ? capturedStyle : nil
             Task {
                 await HistoryService.shared.append(HistoryEntry(
                     mode:       capturedMode,
-                    style:      historyStyle,
+                    style:      capturedMode == .revision ? capturedStyle : nil,
                     transcript: transcribed,
                     result:     finalText
                 ))
             }
 
-            // Preview-Text: bei Revision-Fallback Hinweis anhängen
             let previewBase = String(finalText.prefix(40))
             let preview = (capturedMode == .revision && !didRevise)
                 ? "⚠ KI nicht verfügbar — \(previewBase)"
                 : previewBase
 
-            // Beide Modi: Text ist bereits in der Zwischenablage.
-            // Panel zeigt kurz eine Bestätigung, dann schließt es sich automatisch.
             let delay: UInt64 = capturedMode == .dictation ? 1_000_000_000 : 1_500_000_000
             state = .done(preview: preview)
             try? await Task.sleep(nanoseconds: delay)
@@ -313,7 +309,6 @@ final class RecordingViewModel: ObservableObject {
             state = .idle
 
         } catch {
-            // Fehler im Panel für 3 s anzeigen, dann ausblenden
             state = .error(error.localizedDescription)
             try? await Task.sleep(nanoseconds: 3_000_000_000)
             panelController.hide()
@@ -323,8 +318,6 @@ final class RecordingViewModel: ObservableObject {
 
     // MARK: - Revision
 
-    // Überarbeitet Text mit Apple Intelligence (On-Device, kein Setup nötig).
-    // Gibt (revised, didRevise) zurück — bei Fehler wird der Originaltext zurückgegeben.
     @available(macOS 26, *)
     private func performRevision(of text: String) async -> (revised: String, didRevise: Bool) {
         let service = FoundationModelService()
