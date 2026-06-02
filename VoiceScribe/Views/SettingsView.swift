@@ -342,10 +342,29 @@ private struct WhisperStatusView: View {
         case .idle:
             Text("Nicht geladen")
                 .foregroundStyle(.secondary)
-        case .loading:
-            HStack(spacing: 4) {
+        case .downloading(let progress):
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 6) {
+                    ProgressView().controlSize(.mini)
+                    Text(progress > 0
+                         ? "Lädt herunter… \(Int(progress * 100)) %"
+                         : "Lädt herunter…")
+                }
+                ProgressView(value: progress > 0 ? progress : nil)
+                    .frame(maxWidth: 200)
+                Text("Einmalig ~300 MB von HuggingFace — bitte warten.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        case .compiling:
+            HStack(spacing: 6) {
                 ProgressView().controlSize(.mini)
-                Text("Lade…")
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Modell wird kompiliert…")
+                    Text("CoreML-Spezialisierung für dieses Gerät — einmalig ~2 Min.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
         case .ready:
             Label("Bereit", systemImage: "checkmark.circle.fill")
