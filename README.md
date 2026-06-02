@@ -3,7 +3,7 @@
 Lokale Sprach-Diktiersoftware für macOS als Menu-Bar-App.
 
 - **Diktat-Modus**: Sprache → Whisper → Text in Zwischenablage
-- **Überarbeitungs-Modus**: Sprache → Whisper → KI verfeinert → Text in Zwischenablage
+- **Überarbeitungs-Modus**: Sprache → Whisper → Apple Intelligence verfeinert → Text in Zwischenablage
 - Vollständig offline nach dem ersten Modell-Download
 - Kein Cloud-Dienst, keine Datenübertragung
 
@@ -15,6 +15,9 @@ Lokale Sprach-Diktiersoftware für macOS als Menu-Bar-App.
 |---|---|
 | macOS | **26 (Tahoe)** oder neuer |
 | Chip | Apple Silicon (M1 oder neuer) |
+| Apple Intelligence | Aktiviert in Systemeinstellungen → Apple Intelligence |
+
+> **Hinweis:** Apple Intelligence muss einmalig in den Systemeinstellungen aktiviert werden. Ohne Apple Intelligence ist der Überarbeitungs-Modus nicht verfügbar — der Diktat-Modus funktioniert auf jedem Apple-Silicon-Mac.
 
 ---
 
@@ -68,14 +71,14 @@ Die Stil-Shortcuts (⌥1/⌥2/⌥3) wechseln automatisch in den Überarbeitungs-
 1. **⌥Space** drücken → Panel erscheint, Aufnahme-Timer startet
 2. Sprechen — ein kurzer Ton bestätigt den Start
 3. Aufnahme stoppt automatisch nach Stille — oder **⌥Space** nochmals drücken (Stopp-Ton)
-4. Text landet sofort in der Zwischenablage
+4. Text landet sofort in der Zwischenablage, Panel schließt sich nach 1 Sek.
 
 **Überarbeitung:**
 1. **⌥Space** drücken → Panel erscheint, Aufnahme-Timer startet
 2. Sprechen — ein kurzer Ton bestätigt den Start
 3. Aufnahme stoppt automatisch nach Stille — oder **⌥Space** nochmals drücken (Stopp-Ton)
-4. KI überarbeitet den Text im gewählten Stil
-5. Vorschau erscheint im Panel mit Wort- und Zeichenanzahl → **↩ Kopieren** oder **Verwerfen**
+4. Apple Intelligence überarbeitet den Text im gewählten Stil
+5. Text landet automatisch in der Zwischenablage, Panel schließt sich nach 1,5 Sek.
 
 ### Auto-Stopp nach Stille
 
@@ -95,14 +98,9 @@ Bei jedem Wechsel per Tastenkürzel erscheint kurz ein Icon-Overlay zur Bestäti
 
 ## KI-Überarbeitung (Überarbeitungs-Modus)
 
-VoiceScribe nutzt zwei KI-Engines — automatisch, ohne Konfiguration:
+VoiceScribe nutzt **Apple Intelligence** für die Textüberarbeitung — vollständig lokal auf dem Neural Engine, kein Server, keine Installation.
 
-| Engine | Voraussetzung | Geschwindigkeit |
-|---|---|---|
-| **Apple Intelligence** | macOS 26+, aktiviert in Systemeinstellungen | sehr schnell |
-| **Ollama** (Fallback) | Ollama installiert und gestartet | abhängig vom Modell |
-
-Auf macOS 26 mit Apple Intelligence ist **kein Setup nötig** — die KI läuft on-device.
+**Voraussetzung:** Apple Intelligence muss in Systemeinstellungen → Apple Intelligence aktiviert sein.
 
 ### Überarbeitungs-Stile
 
@@ -118,33 +116,15 @@ VoiceScribe kann deinen persönlichen Schreibstil lernen — ohne Cloud, ohne Tr
 
 **So funktioniert es:**
 - Überarbeitete Texte als Stilreferenz speichern → die KI orientiert sich beim nächsten Mal daran
-- Bis zu 3 Beispiele pro Stil fließen automatisch in den Prompt ein
+- Bis zu 5 Beispiele pro Stil fließen automatisch in den Prompt ein
 
 **Beispiele verwalten:**
 
 | Aktion | Weg |
 |---|---|
-| Aus Überarbeitung speichern | Preview-Panel → **„Stil merken"** (ab 80 Zeichen) |
 | Manuell eingeben | Einstellungen (⌘,) → **Stile** → **+** beim gewünschten Stil |
 | Bearbeiten | Einstellungen → Stile → **✏️** neben dem Beispiel |
 | Löschen | Einstellungen → Stile → **🗑** neben dem Beispiel |
-
----
-
-## Ollama einrichten (optional, Fallback)
-
-Nur nötig wenn Apple Intelligence nicht verfügbar ist.
-
-```bash
-# Ollama installieren
-brew install ollama
-
-# Modell herunterladen
-ollama pull mistral
-```
-
-Den Ollama-Server kannst du direkt in VoiceScribe starten und stoppen:  
-**Einstellungen (⌘,) → Tab „Modelle" → „Ollama starten" / „Ollama stoppen"**
 
 ---
 
@@ -158,7 +138,6 @@ Den Ollama-Server kannst du direkt in VoiceScribe starten und stoppen:
 | Auto-Stopp | Stille-Dauer für automatisches Aufnahme-Ende |
 | Sprache | Deutsch / Englisch / Auto-Erkennung usw. |
 | Whisper-Modell | Tiny (schnell) bis Medium (genau) |
-| Ollama | Server starten/stoppen, Modell auswählen |
 | Stile | Persönliche Stilbeispiele hinzufügen, bearbeiten und löschen |
 
 ---
@@ -173,20 +152,23 @@ Den Ollama-Server kannst du direkt in VoiceScribe starten und stoppen:
 | Medium | ~1,5 GB | Beste Qualität, langsamer |
 
 Das Modell wird beim ersten Start automatisch heruntergeladen (Internetverbindung nötig).  
-Danach vollständig offline.
+Den Fortschritt siehst du in **Einstellungen → Modelle**:
+- **Lädt herunter… X%** — einmaliger Download (~300 MB)
+- **Modell wird kompiliert…** — einmalige CoreML-Spezialisierung für deinen Chip (~2 Min.)
 
-> **Hinweis:** Die erste Transkription dauert etwas länger — macOS kompiliert das Modell einmalig für deinen Chip. Ab der zweiten Transkription ist alles deutlich schneller.
+Danach vollständig offline. Ab der zweiten Transkription ist alles deutlich schneller.
 
 ---
 
 ## Fehlerbehebung
 
-### „Ollama läuft nicht"
-→ Einstellungen (⌘,) → Tab „Modelle" → „Ollama starten" klicken  
-→ Oder Terminal: `ollama serve`
+### „KI nicht verfügbar"
+→ Apple Intelligence ist nicht aktiviert: **Systemeinstellungen → Apple Intelligence → aktivieren**  
+→ Oder: Dein Gerät ist nicht kompatibel (Intel-Mac oder Apple Silicon vor M1)
 
 ### Whisper-Modell lädt nicht
-→ Internetverbindung beim ersten Start erforderlich. Danach vollständig offline.
+→ Internetverbindung beim ersten Start erforderlich. Danach vollständig offline.  
+→ Fortschritt in **Einstellungen (⌘,) → Tab „Modelle"** sichtbar.
 
 ### App erscheint nicht in der Menüleiste
 → App neu starten.
@@ -197,7 +179,7 @@ Danach vollständig offline.
 
 1. VoiceScribe beenden (Menüleiste → „VoiceScribe beenden")
 2. `VoiceScribe.app` in den Papierkorb
-3. Optional Caches löschen: `rm -rf ~/Library/Caches/com.stefanwiggeshoff.VoiceScribe`
+3. Optional Modelle löschen: `rm -rf ~/Library/Containers/com.stefanwiggeshoff.VoiceScribe/Data/Library/Caches/`
 4. Optional Einstellungen löschen: `defaults delete com.stefanwiggeshoff.VoiceScribe`
 
 ---
@@ -207,7 +189,6 @@ Danach vollständig offline.
 - **Swift** / **SwiftUI** / **AppKit**
 - **WhisperKit** — lokale Spracherkennung via Apple Neural Engine (Core ML)
 - **FoundationModels** — Apple Intelligence on-device KI (macOS 26+)
-- **Ollama** — lokaler LLM-Dienst als Fallback
 - **AVFoundation** — Mikrofon-Aufnahme
 - **KeyboardShortcuts** — globale Tastenkürzel
 - Kein Cloud-Dienst, keine Telemetrie, alle Daten bleiben lokal
