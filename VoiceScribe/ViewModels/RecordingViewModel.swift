@@ -6,7 +6,6 @@
 import Foundation
 import AVFoundation
 import AppKit
-import ApplicationServices
 import Combine
 import KeyboardShortcuts
 
@@ -17,23 +16,8 @@ enum RecordingState {
     case recording
     case transcribing
     case revising
-    case preview(text: String)     // Text bereit — Panel ist Key-Window, wartet auf Enter
     case done(preview: String)
     case error(String)
-}
-
-// MARK: - Revision Warning
-
-enum RevisionWarning {
-    case notAvailable(String)
-    case failed(String)
-
-    var message: String {
-        switch self {
-        case .notAvailable(let reason): return "Überarbeitung nicht möglich: \(reason)"
-        case .failed(let reason):       return "Überarbeitung fehlgeschlagen — Originaltext kopiert. (\(reason))"
-        }
-    }
 }
 
 // MARK: - RecordingViewModel
@@ -44,22 +28,16 @@ final class RecordingViewModel: ObservableObject {
     // Published state drives all UI
     @Published var state: RecordingState = .idle
     @Published var audioLevel: AudioLevel = AudioLevel(averageDB: -160, peakDB: -160)
-    // Wird im Preview-Panel als gelber Hinweis angezeigt, wenn die Überarbeitung fehlschlug.
-    @Published var revisionWarning: RevisionWarning?
 
     // Services — all created once and reused
     let audioRecorder  = AudioRecorder()
     let whisperService = WhisperService()
-    let ollamaService  = OllamaService()
     let hud            = HUDController()
 
     private var settings: AppSettings { AppSettings.shared }
     private var panelController = PanelController()
     private var audioCancellable: AnyCancellable?
     private var currentTask: Task<Void, Never>?
-
-    // Suspension point: pipeline wartet hier bis der Nutzer Enter oder Escape drückt.
-    private var insertionContinuation: CheckedContinuation<Bool, Never>?
 
     private var recordingStartTime:      Date? = nil
     private var silencePhaseStart:       Date? = nil   // Beginn der aktuellen Stille-Phase
@@ -136,7 +114,6 @@ final class RecordingViewModel: ObservableObject {
         case .recording:               return "Aufnahme läuft…"
         case .transcribing:            return "Transkribiere…"
         case .revising:                return "KI überarbeitet…"
-        case .preview:                 return "Bereit zum Einfügen"
         case .done(let preview):       return "Fertig: \"\(preview)\""
         case .error(let msg):          return "Fehler: \(msg)"
         }
@@ -144,11 +121,10 @@ final class RecordingViewModel: ObservableObject {
 
     var menuBarIconName: String {
         switch state {
-        case .recording:                           return "waveform.circle.fill"
+        case .recording:               return "waveform.circle.fill"
         case .transcribing, .revising: return "ellipsis.circle"
-        case .preview:                             return "checkmark.circle"
-        case .error:                               return "exclamationmark.circle"
-        default:                                   return "waveform.circle"
+        case .error:                   return "exclamationmark.circle"
+        default:                       return "waveform.circle"
         }
     }
 
@@ -158,12 +134,8 @@ final class RecordingViewModel: ObservableObject {
             stopAndProcess()
         case .idle, .done, .error:
             startRecording()
-        case .preview:
-            cancelInsertion()
         case .transcribing, .revising:
             forceAbort()
-        default:
-            break
         }
     }
 
@@ -210,20 +182,6 @@ final class RecordingViewModel: ObservableObject {
                 loudStart = Date()
             }
         }
-    }
-
-    // MARK: - Preview Confirmation
-
-    /// Wird vom "Einfügen"-Button (oder Enter-Taste) aufgerufen.
-    func confirmInsertion() {
-        insertionContinuation?.resume(returning: true)
-        insertionContinuation = nil
-    }
-
-    /// Wird vom "Verwerfen"-Button, Escape oder dem Tastenkürzel aufgerufen.
-    func cancelInsertion() {
-        insertionContinuation?.resume(returning: false)
-        insertionContinuation = nil
     }
 
     func reloadWhisperModel() {
@@ -309,64 +267,50 @@ final class RecordingViewModel: ObservableObject {
                 return
             }
 
-            var finalText = transcribed
-            revisionWarning = nil
+            // Mode und Style jetzt festhalten, bevor async-Operationen beginnen
+            let capturedMode  = settings.mode
+            let capturedStyle = settings.revisionStyle
 
-            // Schritt 2 (optional): Überarbeitung
-            if settings.mode == .revision {
+            var finalText = transcribed
+            var didRevise = false
+
+            // Schritt 2 (optional): Überarbeitung mit Apple Intelligence
+            if capturedMode == .revision {
                 state = .revising
                 panelController.resize(to: 160)
-                finalText = await performRevision(of: transcribed)
+                if #available(macOS 26, *) {
+                    let result = await performRevision(of: transcribed)
+                    finalText = result.revised
+                    didRevise = result.didRevise
+                }
             }
 
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(finalText, forType: .string)
 
-            let historyMode  = settings.mode
-            let historyStyle = settings.mode == .revision ? settings.revisionStyle : nil
+            let historyStyle = capturedMode == .revision ? capturedStyle : nil
             Task {
                 await HistoryService.shared.append(HistoryEntry(
-                    mode:       historyMode,
+                    mode:       capturedMode,
                     style:      historyStyle,
                     transcript: transcribed,
                     result:     finalText
                 ))
             }
 
-            let preview = String(finalText.prefix(40))
+            // Preview-Text: bei Revision-Fallback Hinweis anhängen
+            let previewBase = String(finalText.prefix(40))
+            let preview = (capturedMode == .revision && !didRevise)
+                ? "⚠ KI nicht verfügbar — \(previewBase)"
+                : previewBase
 
-            if settings.mode == .dictation {
-                // Diktat: Auto-Bestätigung — Text ist bereits in der Zwischenablage.
-                // Panel zeigt 1 Sek. lang eine Bestätigung, dann schließt es sich automatisch.
-                state = .done(preview: preview)
-                try? await Task.sleep(nanoseconds: 1_000_000_000)
-                panelController.hide()
-                state = .idle
-            } else {
-                // Überarbeitung: Vorschau anzeigen, auf Bestätigung warten.
-                state = .preview(text: finalText)
-                panelController.resize(to: 270)
-                panelController.makeKey(
-                    onConfirm: { [weak self] in
-                        Task { @MainActor [weak self] in self?.confirmInsertion() }
-                    },
-                    onCancel: { [weak self] in
-                        Task { @MainActor [weak self] in self?.cancelInsertion() }
-                    }
-                )
-
-                let confirmed = await waitForConfirmation()
-                panelController.hide()
-
-                guard confirmed else {
-                    state = .idle
-                    return
-                }
-
-                state = .done(preview: preview)
-                try? await Task.sleep(nanoseconds: 1_500_000_000)
-                state = .idle
-            }
+            // Beide Modi: Text ist bereits in der Zwischenablage.
+            // Panel zeigt kurz eine Bestätigung, dann schließt es sich automatisch.
+            let delay: UInt64 = capturedMode == .dictation ? 1_000_000_000 : 1_500_000_000
+            state = .done(preview: preview)
+            try? await Task.sleep(nanoseconds: delay)
+            panelController.hide()
+            state = .idle
 
         } catch {
             // Fehler im Panel für 3 s anzeigen, dann ausblenden
@@ -377,77 +321,24 @@ final class RecordingViewModel: ObservableObject {
         }
     }
 
-    /// Pausiert die Pipeline bis der Nutzer im Vorschau-Panel bestätigt oder abbricht.
-    private func waitForConfirmation() async -> Bool {
-        await withCheckedContinuation { continuation in
-            self.insertionContinuation = continuation
-        }
-    }
-
     // MARK: - Revision
 
-    // Versucht den Text zu überarbeiten. Gibt immer einen String zurück —
-    // entweder den überarbeiteten Text oder das Original als Fallback.
-    // Fehlermeldungen werden über revisionWarning an das Panel weitergegeben.
-    private func performRevision(of text: String) async -> String {
-        let style = settings.revisionStyle
-
-        // Bevorzugter Weg: Apple Intelligence (On-Device, kein Setup nötig)
-        if #available(macOS 26, *) {
-            let service = FoundationModelService()
-            if service.isAvailable() {
-                do {
-                    return try await service.revise(text: text, style: style)
-                } catch {
-                    revisionWarning = .failed(error.localizedDescription)
-                    return text
-                }
-            }
-            // Apple Intelligence nicht verfügbar — Grund festhalten, dann Ollama versuchen
-            let reason = service.unavailabilityReason()
-
-            // Fallback: Ollama (wenn installiert und Modell gewählt)
-            if await ollamaService.isRunning(), !settings.ollamaModel.isEmpty {
-                do {
-                    return try await ollamaService.revise(text: text, model: settings.ollamaModel, style: style)
-                } catch {
-                    revisionWarning = .failed(error.localizedDescription)
-                    return text
-                }
-            }
-
-            revisionWarning = .notAvailable(reason)
-            return text
-        }
-
-        // macOS < 26: nur Ollama als Option
-        guard await ollamaService.isRunning() else {
-            revisionWarning = .notAvailable("Ollama läuft nicht (Terminal: ollama serve)")
-            return text
-        }
-        guard !settings.ollamaModel.isEmpty else {
-            revisionWarning = .notAvailable("Kein Ollama-Modell gewählt — Einstellungen → Modelle")
-            return text
+    // Überarbeitet Text mit Apple Intelligence (On-Device, kein Setup nötig).
+    // Gibt (revised, didRevise) zurück — bei Fehler wird der Originaltext zurückgegeben.
+    @available(macOS 26, *)
+    private func performRevision(of text: String) async -> (revised: String, didRevise: Bool) {
+        let service = FoundationModelService()
+        guard service.isAvailable() else {
+            print("[VoiceScribe] Apple Intelligence nicht verfügbar: \(service.unavailabilityReason())")
+            return (text, false)
         }
         do {
-            return try await ollamaService.revise(text: text, model: settings.ollamaModel, style: style)
+            let result = try await service.revise(text: text, style: settings.revisionStyle)
+            return (result, true)
         } catch {
-            revisionWarning = .failed(error.localizedDescription)
-            return text
+            print("[VoiceScribe] Apple Intelligence Fehler: \(error)")
+            return (text, false)
         }
-    }
-
-    // MARK: - Style Examples
-
-    func saveAsStyleExample() {
-        guard case .preview(let text) = state,
-              text.count >= AppSettings.styleExampleMinCharacters else { return }
-
-        let example = StyleExample(
-            style: settings.revisionStyle,
-            revisedText: text
-        )
-        settings.styleExamples.append(example)
     }
 
     // MARK: - Helpers

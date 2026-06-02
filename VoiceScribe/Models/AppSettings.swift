@@ -43,57 +43,62 @@ enum RevisionStyle: String, CaseIterable, Identifiable, Codable {
         switch self {
         case .beruflich:
             return """
-                Du bist ein Transkriptions-Korrektor für professionelles Schriftdeutsch.
+                Du bist ein Transkriptions-Korrektor für professionelles Schriftdeutsch. Deine Aufgabe ist aktive Überarbeitung — nicht minimale Korrektur.
 
-                OBERSTES GEBOT — Worttreue: Ersetze NIEMALS ein gesprochenes Wort durch ein anderes, auch nicht durch ein sinnverwandtes oder "präziseres".
+                DEINE AUFGABEN (alle Punkte sind Pflicht):
+                1. Füllwörter entfernen: öh, ähm, halt, also (als Füllwort), ja (als Füllwort), genau (als Übergangsformel ohne inhaltliche Bedeutung), mal (als Füllwort)
+                2. Satzstruktur glätten: Abbrüche und Neuansätze auflösen, holprige oder unfertige Sätze komplett umformulieren
+                3. Grammatik korrigieren: Kommasetzung, Großschreibung, fehlende Artikel, falsche Flexion
+                4. Gedankenkorrekturen: Wenn der Sprecher abbricht und neu ansetzt, nur die finale Version behalten
+                5. Unstrukturierte Gedanken ordnen: Wenn ein Gedanke klar ist aber chaotisch formuliert, forme ihn in einen klaren, lesbaren Satz um
 
-                Erlaubte Eingriffe (ausschließlich diese):
-                - Füllwörter entfernen: öh, ähm, halt, also
-                - Abbrüche und Wiederholungen entfernen
-                - Satzzeichen, Großschreibung und offensichtliche Grammatikfehler korrigieren (fehlende Artikel, falsche Flexion)
-                - Gedankenkorrekturen: nur die finale Version eines Gedankens behalten
+                NUR DIESES EINE VERBOT — Inhaltswörter sind tabu:
+                Ersetze NIEMALS ein Inhaltswort durch ein anderes — auch nicht durch ein sinnverwandtes.
+                Verboten: "gucken" → "schauen", "was" → "etwas", "erkennen" → "herausfinden", "macht" → "gestaltet" ❌
+                Erlaubt: Wörter weglassen (Füllwörter), Wörter umstellen, Sätze komplett neu bauen ✓
 
-                Behalte die Wortwahl des Sprechers vollständig bei — auch wenn du andere Wörter "besser" finden würdest.
                 Füge KEINE Begrüßungen oder Verabschiedungen hinzu, außer sie wurden explizit diktiert.
                 Antworte IMMER auf Deutsch.
                 Antworte NUR mit dem korrigierten Text, ohne Erklärungen oder Anmerkungen.
                 """
         case .locker:
             return """
-                Du bist ein Transkriptions-Korrektor für gesprochenes Deutsch.
+                Du bist ein Transkriptions-Korrektor für gesprochenes Deutsch. Deine Aufgabe ist aktive Überarbeitung — nicht minimale Korrektur.
 
-                OBERSTES GEBOT — Worttreue: Ersetze NIEMALS ein gesprochenes Wort durch ein anderes.
-                Auch nicht durch ein sinnverwandtes. Auch nicht durch eine "bessere" Formulierung.
-                Falsch: Sprecher sagt "erkennen" → du schreibst "herausfinden". ❌
-                Richtig: Sprecher sagt "erkennen" → du schreibst "erkennen". ✓
+                DEINE AUFGABEN (alle Punkte sind Pflicht):
+                1. Füllwörter entfernen: öh, ähm, halt, also (als Füllwort), ja (als Füllwort), genau (als Übergangsformel ohne inhaltliche Bedeutung), ne, oder?, mal (als Füllwort)
+                2. Satzstruktur glätten: Abbrüche und Neuansätze auflösen, holprige oder unfertige Sätze komplett umformulieren
+                3. Grammatik korrigieren: Kommasetzung, Großschreibung, fehlende Artikel, falsche Flexion
+                4. Gedankenkorrekturen: Wenn der Sprecher abbricht und neu ansetzt ("warte", "also eigentlich", "nein"), nur die finale Version behalten
+                5. Unstrukturierte Gedanken ordnen: Wenn ein Gedanke klar ist aber chaotisch formuliert, forme ihn in einen lesbaren Satz um — behalte dabei den informellen Ton
 
-                Erlaubte Eingriffe (ausschließlich diese):
-                - Füllwörter entfernen: öh, ähm, halt, also, ne, oder?
-                - Offensichtliche Abbrüche und Wiederholungen entfernen
-                - Satzzeichen und Großschreibung ergänzen
-                - Gedankenkorrekturen: Wenn der Sprecher abbricht und neu ansetzt ("warte", "also eigentlich", "nein"), nur die finale Version behalten
+                NUR DIESES EINE VERBOT — Inhaltswörter sind tabu:
+                Ersetze NIEMALS ein Inhaltswort durch ein anderes — auch nicht durch ein sinnverwandtes.
+                Verboten: "gucken" → "schauen", "was" → "etwas", "erkennen" → "herausfinden" ❌
+                Erlaubt: Wörter weglassen (Füllwörter), Wörter umstellen, Sätze komplett neu bauen ✓
 
-                Alles andere bleibt exakt wie gesprochen — Wortwahl, Satzbau, Reihenfolge, Ton.
+                Behalte den informellen Ton des Sprechers.
                 Antworte IMMER auf Deutsch.
                 Antworte NUR mit dem korrigierten Text, ohne Erklärungen.
                 """
         case .mitEmojis:
             return """
-                Du bist ein Transkriptions-Korrektor für gesprochenes Deutsch mit Emojis.
+                Du bist ein Transkriptions-Korrektor für gesprochenes Deutsch mit Emojis. Deine Aufgabe ist aktive Überarbeitung — nicht minimale Korrektur.
 
-                OBERSTES GEBOT — Worttreue: Ersetze NIEMALS ein gesprochenes Wort durch ein anderes.
-                Auch nicht durch ein sinnverwandtes. Auch nicht durch eine "bessere" Formulierung.
-                Falsch: Sprecher sagt "erkennen" → du schreibst "herausfinden". ❌
-                Richtig: Sprecher sagt "erkennen" → du schreibst "erkennen". ✓
+                DEINE AUFGABEN (alle Punkte sind Pflicht):
+                1. Füllwörter entfernen: öh, ähm, halt, also (als Füllwort), ja (als Füllwort), genau (als Übergangsformel ohne inhaltliche Bedeutung), ne, oder?, mal (als Füllwort)
+                2. Satzstruktur glätten: Abbrüche und Neuansätze auflösen, holprige oder unfertige Sätze komplett umformulieren
+                3. Grammatik korrigieren: Kommasetzung, Großschreibung, fehlende Artikel, falsche Flexion
+                4. Gedankenkorrekturen: Wenn der Sprecher abbricht und neu ansetzt ("warte", "also eigentlich", "nein"), nur die finale Version behalten
+                5. Unstrukturierte Gedanken ordnen: Wenn ein Gedanke klar ist aber chaotisch formuliert, forme ihn in einen lesbaren Satz um — behalte dabei den informellen Ton
+                6. Emojis einfügen — das ist Pflicht: dezent 1–2 pro Absatz, maximal eines pro Satz, am Ende eines Satzes. Weniger ist mehr.
 
-                Erlaubte Eingriffe (ausschließlich diese):
-                - Füllwörter entfernen: öh, ähm, halt, also, ne, oder?
-                - Offensichtliche Abbrüche und Wiederholungen entfernen
-                - Satzzeichen und Großschreibung ergänzen
-                - Gedankenkorrekturen: Wenn der Sprecher abbricht und neu ansetzt ("warte", "also eigentlich", "nein"), nur die finale Version behalten
-                - Emojis einfügen — das ist Pflicht: dezent 1–2 pro Absatz, maximal eines pro Satz, am Ende eines Satzes. Weniger ist mehr.
+                NUR DIESES EINE VERBOT — Inhaltswörter sind tabu:
+                Ersetze NIEMALS ein Inhaltswort durch ein anderes — auch nicht durch ein sinnverwandtes.
+                Verboten: "gucken" → "schauen", "was" → "etwas", "erkennen" → "herausfinden" ❌
+                Erlaubt: Wörter weglassen (Füllwörter), Wörter umstellen, Sätze komplett neu bauen ✓
 
-                Alles andere bleibt exakt wie gesprochen — Wortwahl, Satzbau, Reihenfolge, Ton.
+                Behalte den informellen Ton des Sprechers.
                 Antworte IMMER auf Deutsch.
                 Antworte NUR mit dem korrigierten Text, ohne Erklärungen.
                 """
@@ -147,6 +152,8 @@ enum SilenceTimeout: Double, CaseIterable, Identifiable {
 /// Persists to UserDefaults and notifies observers via Combine.
 final class AppSettings: ObservableObject {
 
+    static let appVersion = "1.9.8"
+
     static let shared = AppSettings()
 
     @Published var mode: RecordingMode {
@@ -155,10 +162,6 @@ final class AppSettings: ObservableObject {
 
     @Published var whisperModel: WhisperModelSize {
         didSet { UserDefaults.standard.set(whisperModel.rawValue, forKey: Keys.whisperModel) }
-    }
-
-    @Published var ollamaModel: String {
-        didSet { UserDefaults.standard.set(ollamaModel, forKey: Keys.ollamaModel) }
     }
 
     /// ISO 639-1 language code for Whisper transcription.
@@ -190,9 +193,6 @@ final class AppSettings: ObservableObject {
         let defaults = UserDefaults.standard
         mode = RecordingMode(rawValue: defaults.string(forKey: Keys.mode) ?? "") ?? .dictation
         whisperModel = WhisperModelSize(rawValue: defaults.string(forKey: Keys.whisperModel) ?? "") ?? .small
-        // Kein Default-Modell — der Nutzer wählt in Einstellungen → Modelle.
-        // Ein leerer String führt zu einer verständlichen Fehlermeldung statt Timeout.
-        ollamaModel = defaults.string(forKey: Keys.ollamaModel) ?? ""
         language = defaults.string(forKey: Keys.language) ?? "de"
         silenceTimeout = SilenceTimeout(rawValue: defaults.double(forKey: Keys.silenceTimeout)) ?? .onePointFive
         revisionStyle = RevisionStyle(rawValue: defaults.string(forKey: Keys.revisionStyle) ?? "") ?? .beruflich
@@ -205,12 +205,11 @@ final class AppSettings: ObservableObject {
     }
 
     private enum Keys {
-        static let mode          = "vs_mode"
-        static let whisperModel  = "vs_whisperModel"
-        static let ollamaModel   = "vs_ollamaModel"
-        static let language      = "vs_language"
+        static let mode           = "vs_mode"
+        static let whisperModel   = "vs_whisperModel"
+        static let language       = "vs_language"
         static let silenceTimeout = "vs_silenceTimeout"
         static let revisionStyle  = "vs_revisionStyle"
-        static let styleExamples = "vs_styleExamples"
+        static let styleExamples  = "vs_styleExamples"
     }
 }

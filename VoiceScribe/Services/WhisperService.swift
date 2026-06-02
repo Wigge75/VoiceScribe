@@ -50,9 +50,13 @@ final class WhisperService: ObservableObject {
         loadedModelName = modelName
 
         do {
-            // WhisperKit downloads and caches the CoreML model files automatically.
-            // First run requires internet; subsequent runs are fully offline.
-            whisperKit = try await WhisperKit(WhisperKitConfig(model: modelName))
+            // downloadBase leitet den HuggingFace-Download in den Sandbox-eigenen
+            // Caches-Ordner um. Ohne diese Angabe würde WhisperKit nach
+            // ~/Documents/huggingface/ schreiben, das in der Sandbox nicht erreichbar ist.
+            let downloadBase = FileManager.default
+                .urls(for: .cachesDirectory, in: .userDomainMask)[0]
+            let config = WhisperKitConfig(model: modelName, downloadBase: downloadBase)
+            whisperKit = try await WhisperKit(config)
             loadState = .ready
         } catch {
             loadState = .failed(error.localizedDescription)
@@ -73,6 +77,7 @@ final class WhisperService: ObservableObject {
 
         let options = DecodingOptions(
             language:          language,
+            topK:              1,      // greedy decoding: ~3–5× schneller, minimal weniger akkurat
             withoutTimestamps: true    // wird ohnehin entfernt; sauberere Ausgabe
         )
 
