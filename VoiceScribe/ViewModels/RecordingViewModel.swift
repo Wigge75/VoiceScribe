@@ -269,34 +269,44 @@ final class RecordingViewModel: ObservableObject {
                 return
             }
 
+            // Mode und Style jetzt festhalten, bevor async-Operationen beginnen
+            let capturedMode  = settings.mode
+            let capturedStyle = settings.revisionStyle
+
             var finalText = transcribed
+            var didRevise = false
 
             // Schritt 2 (optional): Überarbeitung
-            if settings.mode == .revision {
+            if capturedMode == .revision {
                 state = .revising
                 panelController.resize(to: 160)
-                finalText = await performRevision(of: transcribed)
+                let result = await performRevision(of: transcribed)
+                finalText  = result.revised
+                didRevise  = result.didRevise
             }
 
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(finalText, forType: .string)
 
-            let historyMode  = settings.mode
-            let historyStyle = settings.mode == .revision ? settings.revisionStyle : nil
+            let historyStyle = capturedMode == .revision ? capturedStyle : nil
             Task {
                 await HistoryService.shared.append(HistoryEntry(
-                    mode:       historyMode,
+                    mode:       capturedMode,
                     style:      historyStyle,
                     transcript: transcribed,
                     result:     finalText
                 ))
             }
 
-            let preview = String(finalText.prefix(40))
+            // Preview-Text: bei Revision-Fallback Hinweis anhängen
+            let previewBase = String(finalText.prefix(40))
+            let preview = (capturedMode == .revision && !didRevise)
+                ? "⚠ KI nicht verfügbar — \(previewBase)"
+                : previewBase
 
             // Beide Modi: Text ist bereits in der Zwischenablage.
             // Panel zeigt kurz eine Bestätigung, dann schließt es sich automatisch.
-            let delay: UInt64 = settings.mode == .dictation ? 1_000_000_000 : 1_500_000_000
+            let delay: UInt64 = capturedMode == .dictation ? 1_000_000_000 : 1_500_000_000
             state = .done(preview: preview)
             try? await Task.sleep(nanoseconds: delay)
             panelController.hide()
@@ -315,7 +325,8 @@ final class RecordingViewModel: ObservableObject {
 
     // Versucht den Text zu überarbeiten. Gibt immer einen String zurück —
     // entweder den überarbeiteten Text oder das Original als Fallback.
-    private func performRevision(of text: String) async -> String {
+    // Gibt zusätzlich zurück ob die Überarbeitung tatsächlich stattgefunden hat.
+    private func performRevision(of text: String) async -> (revised: String, didRevise: Bool) {
         let style = settings.revisionStyle
 
         // Bevorzugter Weg: Apple Intelligence (On-Device, kein Setup nötig)
@@ -323,32 +334,43 @@ final class RecordingViewModel: ObservableObject {
             let service = FoundationModelService()
             if service.isAvailable() {
                 do {
-                    return try await service.revise(text: text, style: style)
+                    let result = try await service.revise(text: text, style: style)
+                    return (result, true)
                 } catch {
-                    return text
+                    print("[VoiceScribe] Apple Intelligence Fehler: \(error)")
+                    return (text, false)
                 }
+            } else {
+                print("[VoiceScribe] Apple Intelligence nicht verfügbar: \(service.unavailabilityReason())")
             }
 
             // Fallback: Ollama (wenn installiert und Modell gewählt)
             if await ollamaService.isRunning(), !settings.ollamaModel.isEmpty {
                 do {
-                    return try await ollamaService.revise(text: text, model: settings.ollamaModel, style: style)
+                    let result = try await ollamaService.revise(text: text, model: settings.ollamaModel, style: style)
+                    return (result, true)
                 } catch {
-                    return text
+                    print("[VoiceScribe] Ollama Fehler: \(error)")
+                    return (text, false)
                 }
+            } else {
+                print("[VoiceScribe] Ollama nicht verfügbar oder kein Modell gewählt")
             }
 
-            return text
+            return (text, false)
         }
 
         // macOS < 26: nur Ollama als Option
         guard await ollamaService.isRunning(), !settings.ollamaModel.isEmpty else {
-            return text
+            print("[VoiceScribe] Ollama nicht verfügbar (macOS < 26)")
+            return (text, false)
         }
         do {
-            return try await ollamaService.revise(text: text, model: settings.ollamaModel, style: style)
+            let result = try await ollamaService.revise(text: text, model: settings.ollamaModel, style: style)
+            return (result, true)
         } catch {
-            return text
+            print("[VoiceScribe] Ollama Fehler: \(error)")
+            return (text, false)
         }
     }
 
