@@ -2,8 +2,9 @@
 
 Lokale Sprach-Diktiersoftware für macOS als Menu-Bar-App.
 
-- **Diktat-Modus**: Sprache → Whisper → Text in Zwischenablage
-- **Überarbeitungs-Modus**: Sprache → Whisper → Apple Intelligence verfeinert → Text in Zwischenablage
+- **Diktat-Modus**: Sprache → Whisper → Text in Zwischenablage (oder direkt einfügen)
+- **Überarbeitungs-Modus**: Sprache → Whisper → Apple Intelligence verfeinert → Text in Zwischenablage (oder direkt einfügen)
+- **Auto-Paste**: Text wird direkt in das zuletzt fokussierte Eingabefeld eingefügt — kein manuelles ⌘V nötig
 - Vollständig offline nach dem ersten Modell-Download
 - Kein Cloud-Dienst, keine Datenübertragung
 
@@ -45,7 +46,12 @@ In Xcode: **Signing & Capabilities** → Team auswählen → **Cmd+R**
 
 ## Berechtigungen beim ersten Start
 
-**Mikrofon**: Wird einmalig beim ersten Drücken des Tastenkürzel angefragt. Keine weiteren Berechtigungen nötig.
+| Berechtigung | Wann | Warum |
+|---|---|---|
+| **Mikrofon** | Beim ersten Drücken des Tastenkürzel | Aufnahme |
+| **Bedienungshilfen** | Beim Aktivieren von Auto-Paste in den Einstellungen | Text direkt in andere Apps einfügen |
+
+Beide Berechtigungen werden einmalig angefragt und bleiben dauerhaft gespeichert.
 
 ---
 
@@ -68,23 +74,28 @@ Die Stil-Shortcuts (⌥1/⌥2/⌥3) wechseln automatisch in den Überarbeitungs-
 ### Ablauf
 
 **Diktat:**
-1. **⌥Space** drücken → Panel erscheint, Aufnahme-Timer startet
-2. Sprechen — ein kurzer Ton bestätigt den Start
-3. Aufnahme stoppt automatisch nach Stille — oder **⌥Space** nochmals drücken (Stopp-Ton)
-4. Text landet sofort in der Zwischenablage, Panel schließt sich nach 1 Sek.
+1. In das gewünschte Textfeld klicken (z.B. WhatsApp, Mail, Notes)
+2. **⌥Space** halten → Panel erscheint, Aufnahme startet
+3. Sprechen
+4. **⌥Space** loslassen → Transkription startet
+5. Text landet in der Zwischenablage — bei aktiviertem Auto-Paste direkt im Textfeld
 
 **Überarbeitung:**
-1. **⌥Space** drücken → Panel erscheint, Aufnahme-Timer startet
-2. Sprechen — ein kurzer Ton bestätigt den Start
-3. Aufnahme stoppt automatisch nach Stille — oder **⌥Space** nochmals drücken (Stopp-Ton)
-4. Apple Intelligence überarbeitet den Text im gewählten Stil
-5. Text landet automatisch in der Zwischenablage, Panel schließt sich nach 1,5 Sek.
+1. In das gewünschte Textfeld klicken
+2. **⌥Space** halten → Panel erscheint, Aufnahme startet
+3. Sprechen
+4. **⌥Space** loslassen → Whisper transkribiert, Apple Intelligence verfeinert
+5. Text landet in der Zwischenablage — bei aktiviertem Auto-Paste direkt im Textfeld
 
-### Auto-Stopp nach Stille
+### Auto-Paste
 
-Die Aufnahme stoppt automatisch wenn du aufgehört hast zu sprechen. Die Stille-Dauer ist konfigurierbar (Aus / 1 / 1,5 / 2 / 3 / 5 Sek., Standard: 1,5 Sek.).
+Mit aktiviertem Auto-Paste entfällt das manuelle ⌘V:
 
-Kurze Umgebungsgeräusche (Stuhlknarzen, Tippen) unterbrechen den Timer nicht.
+1. **Einstellungen (⌘,) → Verhalten nach Aufnahme → „Text automatisch einfügen"** aktivieren
+2. Beim ersten Aktivieren öffnen sich die Systemeinstellungen → VoiceScribe unter **Bedienungshilfen** freigeben
+3. Ab sofort wird der transkribierte Text direkt in das zuletzt fokussierte Eingabefeld eingefügt
+
+> **Datenschutz:** VoiceScribe markiert den Clipboard-Inhalt mit dem `org.nspasteboard.ConcealedType`-Flag — Clipboard-Manager wie Alfred oder Raycast überspringen den Inhalt automatisch.
 
 ### Modus wechseln
 
@@ -110,22 +121,6 @@ VoiceScribe nutzt **Apple Intelligence** für die Textüberarbeitung — vollst�
 | **Locker** | ⌥2 | Natürliche Textnachricht, informell und direkt |
 | **Mit Emojis** | ⌥3 | Locker mit passenden Emojis |
 
-### Persönliche Stilbeispiele (Few-Shot Prompting)
-
-VoiceScribe kann deinen persönlichen Schreibstil lernen — ohne Cloud, ohne Training.
-
-**So funktioniert es:**
-- Überarbeitete Texte als Stilreferenz speichern → die KI orientiert sich beim nächsten Mal daran
-- Bis zu 5 Beispiele pro Stil fließen automatisch in den Prompt ein
-
-**Beispiele verwalten:**
-
-| Aktion | Weg |
-|---|---|
-| Manuell eingeben | Einstellungen (⌘,) → **Stile** → **+** beim gewünschten Stil |
-| Bearbeiten | Einstellungen → Stile → **✏️** neben dem Beispiel |
-| Löschen | Einstellungen → Stile → **🗑** neben dem Beispiel |
-
 ---
 
 ## Einstellungen
@@ -135,10 +130,9 @@ VoiceScribe kann deinen persönlichen Schreibstil lernen — ohne Cloud, ohne Tr
 | Tastenkürzel | Globales Hotkey für Aufnahme + Stil/Modus-Shortcuts |
 | Modus | Diktat oder Überarbeiten |
 | Standard-Stil | Beruflich / Locker / Mit Emojis |
-| Auto-Stopp | Stille-Dauer für automatisches Aufnahme-Ende |
 | Sprache | Deutsch / Englisch / Auto-Erkennung usw. |
+| Text automatisch einfügen | Auto-Paste nach Transkription (erfordert Bedienungshilfen-Berechtigung) |
 | Whisper-Modell | Tiny (schnell) bis Medium (genau) |
-| Stile | Persönliche Stilbeispiele hinzufügen, bearbeiten und löschen |
 
 ---
 
@@ -153,10 +147,10 @@ VoiceScribe kann deinen persönlichen Schreibstil lernen — ohne Cloud, ohne Tr
 
 Das Modell wird beim ersten Start automatisch heruntergeladen (Internetverbindung nötig).  
 Den Fortschritt siehst du in **Einstellungen → Modelle**:
-- **Lädt herunter… X%** — einmaliger Download (~300 MB)
+- **Lädt herunter… X%** — einmaliger Download
 - **Modell wird kompiliert…** — einmalige CoreML-Spezialisierung für deinen Chip (~2 Min.)
 
-Danach vollständig offline. Ab der zweiten Transkription ist alles deutlich schneller.
+Danach vollständig offline.
 
 ---
 
@@ -165,6 +159,9 @@ Danach vollständig offline. Ab der zweiten Transkription ist alles deutlich sch
 ### „KI nicht verfügbar"
 → Apple Intelligence ist nicht aktiviert: **Systemeinstellungen → Apple Intelligence → aktivieren**  
 → Oder: Dein Gerät ist nicht kompatibel (Intel-Mac oder Apple Silicon vor M1)
+
+### Auto-Paste funktioniert nicht
+→ Bedienungshilfen-Berechtigung fehlt: **Systemeinstellungen → Datenschutz & Sicherheit → Bedienungshilfen → VoiceScribe aktivieren**
 
 ### Whisper-Modell lädt nicht
 → Internetverbindung beim ersten Start erforderlich. Danach vollständig offline.  
