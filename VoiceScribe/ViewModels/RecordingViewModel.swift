@@ -149,6 +149,7 @@ final class RecordingViewModel: ObservableObject {
         case .recording:
             stopAndProcess()
         case .idle, .done, .error:
+            pasteTarget = captureFrontmostApp()
             startRecording()
         case .transcribing, .revising:
             forceAbort()
