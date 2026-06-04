@@ -5,6 +5,7 @@ Lokale Sprach-Diktiersoftware für macOS als Menu-Bar-App.
 - **Diktat-Modus**: Sprache → Whisper → Text in Zwischenablage (oder direkt einfügen)
 - **Überarbeitungs-Modus**: Sprache → Whisper → Apple Intelligence verfeinert → Text in Zwischenablage (oder direkt einfügen)
 - **Auto-Paste**: Text wird direkt in das zuletzt fokussierte Eingabefeld eingefügt — kein manuelles ⌘V nötig
+- **Anpassbare Prompts**: Die KI-Anweisungen für jeden Überarbeitungs-Stil sind direkt in der App editierbar
 - Vollständig offline nach dem ersten Modell-Download
 - Kein Cloud-Dienst, keine Datenübertragung
 
@@ -121,18 +122,30 @@ VoiceScribe nutzt **Apple Intelligence** für die Textüberarbeitung — vollst�
 | **Locker** | ⌥2 | Natürliche Textnachricht, informell und direkt |
 | **Mit Emojis** | ⌥3 | Locker mit passenden Emojis |
 
+### Prompts anpassen
+
+Die KI-Anweisungen (System-Prompts) für jeden Stil sind in den Einstellungen editierbar:
+
+1. **⌘, → Tab „Prompts"** öffnen
+2. Stil oben auswählen (Beruflich / Locker / Mit Emojis)
+3. Prompt im Textfeld bearbeiten
+4. **„Speichern"** klicken — der Button ist nur aktiv, wenn es ungespeicherte Änderungen gibt
+
+Die Prompts werden dauerhaft gespeichert und beim nächsten Start wiederhergestellt. Ein leerer Prompt kann nicht gespeichert werden.
+
 ---
 
 ## Einstellungen
 
-| Einstellung | Beschreibung |
-|---|---|
-| Tastenkürzel | Globales Hotkey für Aufnahme + Stil/Modus-Shortcuts |
-| Modus | Diktat oder Überarbeiten |
-| Standard-Stil | Beruflich / Locker / Mit Emojis |
-| Sprache | Deutsch / Englisch / Auto-Erkennung usw. |
-| Text automatisch einfügen | Auto-Paste nach Transkription (erfordert Bedienungshilfen-Berechtigung) |
-| Whisper-Modell | Tiny (schnell) bis Medium (genau) |
+| Einstellung | Tab | Beschreibung |
+|---|---|---|
+| Tastenkürzel | Allgemein | Globales Hotkey für Aufnahme + Stil/Modus-Shortcuts |
+| Modus | Allgemein | Diktat oder Überarbeiten |
+| Standard-Stil | Allgemein | Beruflich / Locker / Mit Emojis |
+| Sprache | Allgemein | Deutsch / Englisch / Auto-Erkennung usw. |
+| Text automatisch einfügen | Allgemein | Auto-Paste nach Transkription (erfordert Bedienungshilfen-Berechtigung) |
+| Whisper-Modell | Modelle | Tiny (schnell) bis Medium (genau) |
+| System-Prompts | Prompts | KI-Anweisungen pro Überarbeitungs-Stil frei editierbar |
 
 ---
 
