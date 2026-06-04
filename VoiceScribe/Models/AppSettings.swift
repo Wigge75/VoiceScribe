@@ -129,6 +129,14 @@ final class AppSettings: ObservableObject {
         }
     }
 
+    func setPrompt(_ text: String, for style: RevisionStyle) {
+        switch style {
+        case .beruflich: promptBeruflich = text
+        case .locker:    promptLocker = text
+        case .mitEmojis: promptMitEmojis = text
+        }
+    }
+
     private init() {
         let defaults = UserDefaults.standard
         mode = RecordingMode(rawValue: defaults.string(forKey: Keys.mode) ?? "") ?? .dictation

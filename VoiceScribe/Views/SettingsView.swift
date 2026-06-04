@@ -165,17 +165,15 @@ private struct PromptsTab: View {
 
     @EnvironmentObject var settings: AppSettings
     @State private var selectedStyle: RevisionStyle = .beruflich
-
-    private var promptBinding: Binding<String> {
-        switch selectedStyle {
-        case .beruflich: return $settings.promptBeruflich
-        case .locker:    return $settings.promptLocker
-        case .mitEmojis: return $settings.promptMitEmojis
-        }
-    }
+    @State private var editedPrompt: String = ""
+    @State private var saved: Bool = false
 
     private var isEmpty: Bool {
-        promptBinding.wrappedValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        editedPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private var hasUnsavedChanges: Bool {
+        editedPrompt != settings.prompt(for: selectedStyle)
     }
 
     var body: some View {
@@ -187,21 +185,47 @@ private struct PromptsTab: View {
                     }
                 }
                 .pickerStyle(.segmented)
+                .onChange(of: selectedStyle) { _, _ in
+                    editedPrompt = settings.prompt(for: selectedStyle)
+                    saved = false
+                }
             }
 
             Section("System-Prompt") {
-                TextEditor(text: promptBinding)
+                TextEditor(text: $editedPrompt)
                     .font(.system(.body, design: .monospaced))
                     .frame(minHeight: 260)
+                    .onChange(of: editedPrompt) { _, _ in saved = false }
 
-                if isEmpty {
-                    Label("Der Prompt darf nicht leer sein.", systemImage: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.red)
-                        .font(.caption)
+                HStack {
+                    if isEmpty {
+                        Label("Der Prompt darf nicht leer sein.", systemImage: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
+                            .font(.caption)
+                    } else if saved {
+                        Label("Gespeichert", systemImage: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                            .font(.caption)
+                    } else if hasUnsavedChanges {
+                        Label("Ungespeicherte Änderungen", systemImage: "circle.fill")
+                            .foregroundStyle(.orange)
+                            .font(.caption)
+                    }
+
+                    Spacer()
+
+                    Button("Speichern") {
+                        settings.setPrompt(editedPrompt, for: selectedStyle)
+                        saved = true
+                    }
+                    .disabled(isEmpty || !hasUnsavedChanges)
                 }
             }
         }
         .formStyle(.grouped)
+        .onAppear {
+            editedPrompt = settings.prompt(for: selectedStyle)
+        }
     }
 }
 
