@@ -20,6 +20,13 @@ enum RecordingState {
     case error(String)
 }
 
+// MARK: - PasteTarget
+
+private struct PasteTarget {
+    let processIdentifier: pid_t
+    let application: NSRunningApplication
+}
+
 // MARK: - RecordingViewModel
 
 @MainActor
@@ -39,11 +46,11 @@ final class RecordingViewModel: ObservableObject {
     private var audioCancellable: AnyCancellable?
     private var currentTask: Task<Void, Never>?
 
+    private static let concealedPasteboardType = NSPasteboard.PasteboardType("org.nspasteboard.ConcealedType")
+
     private var pendingRecordingURL: URL?
-    private var recordingStartTime:     Date? = nil
-    private var silencePhaseStart:      Date? = nil
-    private var silenceAccumulatedTime: TimeInterval = 0
-    private var loudStart:              Date? = nil
+    private var recordingStartTime: Date? = nil
+    private var pasteTarget: PasteTarget?
 
     // MARK: - Init
 
@@ -51,14 +58,20 @@ final class RecordingViewModel: ObservableObject {
         audioCancellable = audioRecorder.$audioLevel
             .receive(on: RunLoop.main)
             .sink { [weak self] level in
-                guard let self else { return }
-                self.audioLevel = level
-                self.checkSilence(level)
+                self?.audioLevel = level
             }
 
         KeyboardShortcuts.onKeyDown(for: .toggleRecording) { [weak self] in
             Task { @MainActor [weak self] in
-                self?.toggleRecording()
+                guard let self, case .idle = self.state else { return }
+                self.pasteTarget = self.captureFrontmostApp()
+                self.startRecording()
+            }
+        }
+        KeyboardShortcuts.onKeyUp(for: .toggleRecording) { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self, case .recording = self.state else { return }
+                self.stopAndProcess()
             }
         }
 
@@ -113,7 +126,7 @@ final class RecordingViewModel: ObservableObject {
 
     var statusSummary: String {
         switch state {
-        case .idle:              return "Bereit (⌥Space)"
+        case .idle:              return "Halten für Aufnahme (⌥Space)"
         case .recording:         return "Aufnahme läuft…"
         case .transcribing:      return "Transkribiere…"
         case .revising:          return "KI überarbeitet…"
@@ -143,10 +156,7 @@ final class RecordingViewModel: ObservableObject {
     }
 
     func forceAbort() {
-        silencePhaseStart = nil
-        silenceAccumulatedTime = 0
         recordingStartTime = nil
-        loudStart = nil
         currentTask?.cancel()
         currentTask = nil
         panelController.hide()
@@ -155,44 +165,6 @@ final class RecordingViewModel: ObservableObject {
 
     func reloadWhisperModel() {
         Task { await whisperService.loadModel(settings.whisperModel.rawValue) }
-    }
-
-    // MARK: - Silence Detection
-
-    private func checkSilence(_ level: AudioLevel) {
-        guard case .recording = state else {
-            silencePhaseStart = nil
-            silenceAccumulatedTime = 0
-            loudStart = nil
-            return
-        }
-        guard settings.silenceTimeout != .off else { return }
-        guard let startTime = recordingStartTime,
-              Date().timeIntervalSince(startTime) >= 1.0 else { return }
-
-        if level.averageDB < -40.0 {
-            loudStart = nil
-            if silencePhaseStart == nil { silencePhaseStart = Date() }
-            let total = silenceAccumulatedTime + Date().timeIntervalSince(silencePhaseStart!)
-            if total >= settings.silenceTimeout.rawValue {
-                silencePhaseStart = nil
-                silenceAccumulatedTime = 0
-                recordingStartTime = nil
-                loudStart = nil
-                stopAndProcess()
-            }
-        } else {
-            if let phaseStart = silencePhaseStart {
-                silenceAccumulatedTime += Date().timeIntervalSince(phaseStart)
-                silencePhaseStart = nil
-            }
-            if loudStart == nil {
-                loudStart = Date()
-            } else if Date().timeIntervalSince(loudStart!) >= 0.4 {
-                silenceAccumulatedTime = 0
-                loudStart = Date()
-            }
-        }
     }
 
     // MARK: - Recording
@@ -219,10 +191,7 @@ final class RecordingViewModel: ObservableObject {
     }
 
     private func stopAndProcess() {
-        silencePhaseStart = nil
-        silenceAccumulatedTime = 0
         recordingStartTime = nil
-        loudStart = nil
         currentTask?.cancel()
         currentTask = nil
 
@@ -286,7 +255,14 @@ final class RecordingViewModel: ObservableObject {
             }
 
             NSPasteboard.general.clearContents()
+            NSPasteboard.general.declareTypes([.string, Self.concealedPasteboardType], owner: nil)
             NSPasteboard.general.setString(finalText, forType: .string)
+            NSPasteboard.general.setString("", forType: Self.concealedPasteboardType)
+
+            if settings.autoPaste {
+                pasteAtCursor(target: pasteTarget)
+            }
+            pasteTarget = nil
 
             Task {
                 await HistoryService.shared.append(HistoryEntry(
@@ -326,12 +302,61 @@ final class RecordingViewModel: ObservableObject {
             return (text, false)
         }
         do {
-            let result = try await service.revise(text: text, style: settings.revisionStyle)
+            let result = try await service.revise(text: text, systemPrompt: settings.prompt(for: settings.revisionStyle))
             return (result, true)
         } catch {
             print("[VoiceScribe] Apple Intelligence Fehler: \(error)")
             return (text, false)
         }
+    }
+
+    // MARK: - Auto-Paste
+
+    private func captureFrontmostApp() -> PasteTarget? {
+        guard let app = NSWorkspace.shared.frontmostApplication else { return nil }
+        let ownPid = NSRunningApplication.current.processIdentifier
+        guard app.processIdentifier != ownPid else { return nil }
+        return PasteTarget(processIdentifier: app.processIdentifier, application: app)
+    }
+
+    private func pasteAtCursor(target: PasteTarget?) {
+        guard AXIsProcessTrusted() else { return }
+        guard let target else { return }
+        attemptPaste(target: target, attemptsRemaining: 22)
+    }
+
+    private func attemptPaste(target: PasteTarget, attemptsRemaining: Int) {
+        let frontmostPid = NSWorkspace.shared.frontmostApplication?.processIdentifier
+
+        if frontmostPid == target.processIdentifier {
+            performPaste()
+            return
+        }
+
+        target.application.activate(options: [])
+
+        guard attemptsRemaining > 0 else { return }
+
+        let delay: TimeInterval
+        switch attemptsRemaining {
+        case 16...: delay = 0.015
+        case 8...15: delay = 0.025
+        default:     delay = 0.04
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            self?.attemptPaste(target: target, attemptsRemaining: attemptsRemaining - 1)
+        }
+    }
+
+    private func performPaste() {
+        let source  = CGEventSource(stateID: .hidSystemState)
+        let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true)
+        let keyUp   = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false)
+        keyDown?.flags = .maskCommand
+        keyUp?.flags   = .maskCommand
+        keyDown?.post(tap: .cghidEventTap)
+        keyUp?.post(tap: .cghidEventTap)
     }
 
     // MARK: - Helpers
