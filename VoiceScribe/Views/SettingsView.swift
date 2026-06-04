@@ -22,8 +22,8 @@ struct SettingsView: View {
                 .environmentObject(settings)
                 .environmentObject(viewModel)
 
-            StylesTab()
-                .tabItem { Label("Stile", systemImage: "bookmark.fill") }
+            PromptsTab()
+                .tabItem { Label("Prompts", systemImage: "text.bubble") }
                 .environmentObject(settings)
         }
         .padding()
@@ -41,7 +41,7 @@ private struct GeneralTab: View {
         Form {
             // Keyboard Shortcut
             Section("Tastenkürzel") {
-                KeyboardShortcuts.Recorder("Aufnahme starten / stoppen:", name: .toggleRecording)
+                KeyboardShortcuts.Recorder("Push-to-Talk (halten für Aufnahme):", name: .toggleRecording)
                     .help("Drücke eine Tastenkombination. Die Standard-Kombination ist ⌥Space.")
                 KeyboardShortcuts.Recorder("Modus wechseln (⌥0):", name: .toggleMode)
                 KeyboardShortcuts.Recorder("Stil: Beruflich (⌥1):", name: .selectStyleBeruflich)
@@ -79,27 +79,6 @@ private struct GeneralTab: View {
                 }
             }
 
-            // Auto-Stop
-            Section("Auto-Stopp") {
-                Picker("Stopp nach Stille", selection: $settings.silenceTimeout) {
-                    ForEach(SilenceTimeout.allCases) { timeout in
-                        Text(timeout.displayName).tag(timeout)
-                    }
-                }
-                .pickerStyle(.menu)
-
-                Text("Aufnahme stoppt automatisch nach der gewählten Stille-Dauer. Standard: 1,5 Sek.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                Label(
-                    "Endet die Aufnahme zu früh? Sehr leise Sprache kann als Stille erkannt werden — näher ans Mikrofon sprechen oder eine längere Stille-Dauer wählen.",
-                    systemImage: "info.circle"
-                )
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            }
-
             // Language
             Section("Sprache") {
                 Picker("Transkriptions-Sprache", selection: $settings.language) {
@@ -115,6 +94,19 @@ private struct GeneralTab: View {
                 }
 
                 Text("Bei Deutsch empfiehlt sich \"Deutsch\" statt \"Automatisch\" für bessere Genauigkeit.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Verhalten nach Aufnahme") {
+                Toggle("Text automatisch einfügen", isOn: $settings.autoPaste)
+                    .onChange(of: settings.autoPaste) { _, newValue in
+                        if newValue && !AXIsProcessTrusted() {
+                            let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
+                            AXIsProcessTrustedWithOptions(options)
+                        }
+                    }
+                Text("Fügt den transkribierten Text direkt in das zuletzt fokussierte Eingabefeld ein. Erfordert einmalig die Berechtigung unter Systemeinstellungen > Datenschutz > Bedienungshilfen.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -167,6 +159,76 @@ private struct ModelsTab: View {
     }
 }
 
+// MARK: - Prompts Tab
+
+private struct PromptsTab: View {
+
+    @EnvironmentObject var settings: AppSettings
+    @State private var selectedStyle: RevisionStyle = .beruflich
+    @State private var editedPrompt: String = ""
+    @State private var saved: Bool = false
+
+    private var isEmpty: Bool {
+        editedPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private var hasUnsavedChanges: Bool {
+        editedPrompt != settings.prompt(for: selectedStyle)
+    }
+
+    var body: some View {
+        Form {
+            Section("Stil") {
+                Picker("Stil", selection: $selectedStyle) {
+                    ForEach(RevisionStyle.allCases) { style in
+                        Text(style.displayName).tag(style)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .onChange(of: selectedStyle) { _, _ in
+                    editedPrompt = settings.prompt(for: selectedStyle)
+                    saved = false
+                }
+            }
+
+            Section("System-Prompt") {
+                TextEditor(text: $editedPrompt)
+                    .font(.system(.body, design: .monospaced))
+                    .frame(minHeight: 260)
+                    .onChange(of: editedPrompt) { _, _ in saved = false }
+
+                HStack {
+                    if isEmpty {
+                        Label("Der Prompt darf nicht leer sein.", systemImage: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
+                            .font(.caption)
+                    } else if saved {
+                        Label("Gespeichert", systemImage: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                            .font(.caption)
+                    } else if hasUnsavedChanges {
+                        Label("Ungespeicherte Änderungen", systemImage: "circle.fill")
+                            .foregroundStyle(.orange)
+                            .font(.caption)
+                    }
+
+                    Spacer()
+
+                    Button("Speichern") {
+                        settings.setPrompt(editedPrompt, for: selectedStyle)
+                        saved = true
+                    }
+                    .disabled(isEmpty || !hasUnsavedChanges)
+                }
+            }
+        }
+        .formStyle(.grouped)
+        .onAppear {
+            editedPrompt = settings.prompt(for: selectedStyle)
+        }
+    }
+}
+
 // MARK: - Whisper Status View
 
 private struct WhisperStatusView: View {
@@ -192,222 +254,4 @@ private struct WhisperStatusView: View {
     }
 }
 
-// MARK: - Styles Tab
-
-private struct EditorContext: Identifiable {
-    let id = UUID()
-    let style: RevisionStyle
-    let existing: StyleExample?
-}
-
-private struct StylesTab: View {
-    @EnvironmentObject var settings: AppSettings
-    @State private var editorContext: EditorContext?
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                ForEach(RevisionStyle.allCases) { style in
-                    let examples = settings.styleExamples
-                        .filter { $0.style == style }
-                        .sorted { $0.createdAt > $1.createdAt }
-
-                    StyleExamplesSection(
-                        style: style,
-                        examples: examples,
-                        onAdd:  { editorContext = EditorContext(style: style, existing: nil) },
-                        onEdit: { editorContext = EditorContext(style: style, existing: $0) }
-                    )
-                    .environmentObject(settings)
-                }
-            }
-            .padding()
-        }
-        .frame(minHeight: 300)
-        .sheet(item: $editorContext) { ctx in
-            ExampleEditorSheet(context: ctx)
-                .environmentObject(settings)
-        }
-    }
-}
-
-private struct StyleExamplesSection: View {
-    @EnvironmentObject var settings: AppSettings
-    let style: RevisionStyle
-    let examples: [StyleExample]
-    var onAdd:  () -> Void
-    var onEdit: (StyleExample) -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Label(style.displayName, systemImage: style.sfSymbol)
-                    .font(.headline)
-                    .foregroundColor(style.accentColor)
-                Spacer()
-                Button { onAdd() } label: {
-                    Image(systemName: "plus.circle")
-                        .font(.system(size: 15))
-                        .foregroundStyle(style.accentColor)
-                }
-                .buttonStyle(.plain)
-                .help("Neues \(style.displayName)-Beispiel hinzufügen")
-            }
-
-            if examples.isEmpty {
-                Text("Noch keine Beispiele.")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-                    .padding(.vertical, 4)
-            } else {
-                ForEach(examples) { example in
-                    StyleExampleRow(example: example, onEdit: { onEdit(example) })
-                        .environmentObject(settings)
-                }
-            }
-        }
-    }
-}
-
-private struct StyleExampleRow: View {
-    @EnvironmentObject var settings: AppSettings
-    let example: StyleExample
-    var onEdit: () -> Void
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(example.revisedText)
-                    .font(.system(size: 12))
-                    .lineLimit(3)
-                    .foregroundStyle(.primary)
-
-                Text(example.createdAt.formatted(date: .abbreviated, time: .shortened))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            Spacer()
-
-            Button { onEdit() } label: {
-                Image(systemName: "pencil")
-                    .font(.system(size: 12))
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.secondary)
-            .help("Beispiel bearbeiten")
-
-            Button(role: .destructive) {
-                settings.styleExamples.removeAll { $0.id == example.id }
-            } label: {
-                Image(systemName: "trash")
-                    .font(.system(size: 12))
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.red)
-            .help("Beispiel löschen")
-        }
-        .padding(10)
-        .background(Color(nsColor: .controlBackgroundColor))
-        .cornerRadius(8)
-    }
-}
-
-// MARK: - Example Editor Sheet
-
-private struct ExampleEditorSheet: View {
-    @EnvironmentObject var settings: AppSettings
-    @Environment(\.dismiss) private var dismiss
-    let context: EditorContext
-    @State private var draftText: String
-
-    init(context: EditorContext) {
-        self.context = context
-        _draftText = State(initialValue: context.existing?.revisedText ?? "")
-    }
-
-    private var isValid: Bool {
-        draftText.count >= AppSettings.styleExampleMinCharacters &&
-        draftText.count <= AppSettings.styleExampleMaxCharacters
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Label(
-                    context.existing == nil
-                        ? "Neues \(context.style.displayName)-Beispiel"
-                        : "\(context.style.displayName)-Beispiel bearbeiten",
-                    systemImage: context.style.sfSymbol
-                )
-                .font(.headline)
-                .foregroundColor(context.style.accentColor)
-                Spacer()
-            }
-
-            TextEditor(text: $draftText)
-                .font(.system(size: 13))
-                .frame(minHeight: 120)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 6)
-                        .strokeBorder(
-                            draftText.count > AppSettings.styleExampleMaxCharacters
-                                ? Color.red : Color(nsColor: .separatorColor),
-                            lineWidth: 1
-                        )
-                )
-                .onChange(of: draftText) { _, new in
-                    if new.count > AppSettings.styleExampleMaxCharacters {
-                        draftText = String(new.prefix(AppSettings.styleExampleMaxCharacters))
-                    }
-                }
-
-            HStack {
-                if draftText.count < AppSettings.styleExampleMinCharacters {
-                    Text("Noch \(AppSettings.styleExampleMinCharacters - draftText.count) Zeichen bis zum Minimum")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                } else if draftText.count > AppSettings.styleExampleMaxCharacters {
-                    Text("\(draftText.count)/\(AppSettings.styleExampleMaxCharacters) — zu lang")
-                        .font(.caption)
-                        .foregroundStyle(.red)
-                } else {
-                    Text("\(draftText.count)/\(AppSettings.styleExampleMaxCharacters)")
-                        .font(.caption)
-                        .foregroundStyle(
-                            draftText.count > AppSettings.styleExampleMaxCharacters - 50
-                                ? .orange : .secondary
-                        )
-                }
-                Spacer()
-            }
-
-            HStack {
-                Button("Abbrechen") { dismiss() }
-                    .keyboardShortcut(.cancelAction)
-                Spacer()
-                Button("Speichern") { save(); dismiss() }
-                    .keyboardShortcut(.defaultAction)
-                    .disabled(!isValid)
-            }
-        }
-        .padding(20)
-        .frame(width: 440, height: 240)
-    }
-
-    private func save() {
-        if let existing = context.existing {
-            if let idx = settings.styleExamples.firstIndex(where: { $0.id == existing.id }) {
-                settings.styleExamples[idx] = StyleExample(
-                    id: existing.id,
-                    style: context.style,
-                    revisedText: draftText,
-                    createdAt: existing.createdAt
-                )
-            }
-        } else {
-            settings.styleExamples.append(StyleExample(style: context.style, revisedText: draftText))
-        }
-    }
-}
 

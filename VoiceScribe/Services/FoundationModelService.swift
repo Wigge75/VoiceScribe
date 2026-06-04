@@ -50,20 +50,9 @@ final class FoundationModelService {
 
     // MARK: - Revision
 
-    func revise(text: String, style: RevisionStyle) async throws -> String {
+    func revise(text: String, systemPrompt: String) async throws -> String {
         guard isAvailable() else {
             throw FoundationModelRevisionError.notAvailable(reason: unavailabilityReason())
-        }
-
-        let relevant = AppSettings.shared.styleExamples
-            .filter { $0.style == style }
-            .sorted { $0.createdAt > $1.createdAt }
-            .prefix(5)
-
-        var systemPrompt = style.systemPrompt
-        if !relevant.isEmpty {
-            let block = relevant.map { "- \($0.revisedText)" }.joined(separator: "\n")
-            systemPrompt += "\n\nSchreibstil-Referenz des Nutzers (NUR zur Orientierung, nicht ausgeben):\n\(block)"
         }
 
         let promptParts: [String] = [
