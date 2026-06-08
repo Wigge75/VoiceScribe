@@ -1,8 +1,9 @@
 // SettingsView.swift
 // Settings window opened via Cmd+, or from the menu bar dropdown.
-// Two tabs: General (hotkey, mode, language) and Models (Whisper + Apple Intelligence).
+// Three tabs: Setup, General, and Prompts.
 
 import SwiftUI
+import AVFoundation
 import KeyboardShortcuts
 
 struct SettingsView: View {
@@ -12,13 +13,12 @@ struct SettingsView: View {
 
     var body: some View {
         TabView {
+            SetupTab()
+                .tabItem { Label("Setup", systemImage: "checklist") }
+                .environmentObject(settings)
+
             GeneralTab()
                 .tabItem { Label("Allgemein", systemImage: "gear") }
-                .environmentObject(settings)
-                .environmentObject(viewModel)
-
-            ModelsTab()
-                .tabItem { Label("Modelle", systemImage: "cpu") }
                 .environmentObject(settings)
                 .environmentObject(viewModel)
 
@@ -27,6 +27,144 @@ struct SettingsView: View {
                 .environmentObject(settings)
         }
         .padding()
+    }
+}
+
+// MARK: - Setup Tab
+
+private struct SetupTab: View {
+
+    @EnvironmentObject var settings: AppSettings
+    @State private var accessibilityTrusted = AXIsProcessTrusted()
+    @State private var microphoneStatus = AVCaptureDevice.authorizationStatus(for: .audio)
+
+    var body: some View {
+        Form {
+            Section("VoiceScribe einrichten") {
+                Text("Für die beste Nutzung braucht VoiceScribe Mikrofon-Zugriff. Automatisches Einfügen benötigt zusätzlich Bedienungshilfen.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Freigaben") {
+                SetupStatusRow(
+                    title: "Mikrofon",
+                    detail: microphoneDetail,
+                    isReady: microphoneStatus == .authorized,
+                    actionTitle: microphoneActionTitle,
+                    action: handleMicrophoneAction
+                )
+
+                SetupStatusRow(
+                    title: "Bedienungshilfen",
+                    detail: "Erlaubt VoiceScribe, den transkribierten Text per Cmd+V in das zuletzt fokussierte Textfeld einzufügen.",
+                    isReady: accessibilityTrusted,
+                    actionTitle: "Einstellungen öffnen",
+                    action: openAccessibilitySettings
+                )
+            }
+
+            Section("Automatisch einfügen") {
+                Toggle("Text automatisch einfügen", isOn: $settings.autoPaste)
+                    .onChange(of: settings.autoPaste) { _, newValue in
+                        if newValue && !AXIsProcessTrusted() {
+                            requestAccessibilityPermission()
+                        }
+                        refreshPermissionState()
+                    }
+
+                Text("Wenn aktiviert, landet der Text nach der Aufnahme direkt im aktuellen Eingabefeld. Ohne diese Option bleibt der Text in der Zwischenablage und kann manuell mit Cmd+V eingefügt werden.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Apple Intelligence") {
+                Label("Überarbeitung läuft lokal auf dem Gerät", systemImage: "apple.intelligence")
+                    .foregroundStyle(.primary)
+
+                Text("Der Überarbeitungs-Modus nutzt Apple Intelligence. Dafür muss Apple Intelligence in den Systemeinstellungen aktiviert und auf diesem Mac verfügbar sein.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .formStyle(.grouped)
+        .onAppear(perform: refreshPermissionState)
+    }
+
+    private var microphoneDetail: String {
+        switch microphoneStatus {
+        case .authorized:
+            return "VoiceScribe darf dein Mikrofon für Aufnahmen verwenden."
+        case .denied, .restricted:
+            return "Der Mikrofon-Zugriff ist gesperrt. Bitte in den Systemeinstellungen erlauben."
+        case .notDetermined:
+            return "VoiceScribe fragt beim ersten Aufnehmen nach Mikrofon-Zugriff."
+        @unknown default:
+            return "Der aktuelle Mikrofon-Status konnte nicht eindeutig gelesen werden."
+        }
+    }
+
+    private var microphoneActionTitle: String {
+        microphoneStatus == .notDetermined ? "Freigabe anfragen" : "Einstellungen öffnen"
+    }
+
+    private func handleMicrophoneAction() {
+        if microphoneStatus == .notDetermined {
+            AVCaptureDevice.requestAccess(for: .audio) { _ in
+                DispatchQueue.main.async {
+                    refreshPermissionState()
+                }
+            }
+        } else {
+            openPrivacySettings(anchor: "Privacy_Microphone")
+        }
+    }
+
+    private func openAccessibilitySettings() {
+        requestAccessibilityPermission()
+        openPrivacySettings(anchor: "Privacy_Accessibility")
+    }
+
+    private func requestAccessibilityPermission() {
+        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
+        AXIsProcessTrustedWithOptions(options)
+    }
+
+    private func openPrivacySettings(anchor: String) {
+        guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?\(anchor)") else { return }
+        NSWorkspace.shared.open(url)
+    }
+
+    private func refreshPermissionState() {
+        accessibilityTrusted = AXIsProcessTrusted()
+        microphoneStatus = AVCaptureDevice.authorizationStatus(for: .audio)
+    }
+}
+
+private struct SetupStatusRow: View {
+    let title: String
+    let detail: String
+    let isReady: Bool
+    let actionTitle: String
+    let action: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline) {
+                Label(title, systemImage: isReady ? "checkmark.circle.fill" : "exclamationmark.circle.fill")
+                    .foregroundStyle(isReady ? .green : .orange)
+
+                Spacer()
+
+                Button(actionTitle, action: action)
+                    .buttonStyle(.bordered)
+            }
+
+            Text(detail)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 2)
     }
 }
 
@@ -98,34 +236,7 @@ private struct GeneralTab: View {
                     .foregroundStyle(.secondary)
             }
 
-            Section("Verhalten nach Aufnahme") {
-                Toggle("Text automatisch einfügen", isOn: $settings.autoPaste)
-                    .onChange(of: settings.autoPaste) { _, newValue in
-                        if newValue && !AXIsProcessTrusted() {
-                            let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
-                            AXIsProcessTrustedWithOptions(options)
-                        }
-                    }
-                Text("Fügt den transkribierten Text direkt in das zuletzt fokussierte Eingabefeld ein. Erfordert einmalig die Berechtigung unter Systemeinstellungen > Datenschutz > Bedienungshilfen.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-        }
-        .formStyle(.grouped)
-    }
-}
-
-// MARK: - Models Tab
-
-private struct ModelsTab: View {
-
-    @EnvironmentObject var settings:  AppSettings
-    @EnvironmentObject var viewModel: RecordingViewModel
-
-    var body: some View {
-        Form {
-            Section("Whisper-Modell (Transkription)") {
+            Section("Whisper-Modell") {
                 Picker("Modell", selection: $settings.whisperModel) {
                     ForEach(WhisperModelSize.allCases) { model in
                         Text(model.displayName).tag(model)
@@ -143,14 +254,6 @@ private struct ModelsTab: View {
                 }
 
                 Text("Das Modell wird beim ersten Mal automatisch heruntergeladen (~300 MB für Base).")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            Section("Überarbeitungs-Modus") {
-                Label("Apple Intelligence (On-Device)", systemImage: "apple.intelligence")
-                    .foregroundStyle(.primary)
-                Text("Läuft vollständig lokal auf dem Neural Engine. Kein Server, keine Installation erforderlich.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -253,5 +356,3 @@ private struct WhisperStatusView: View {
         }
     }
 }
-
-
