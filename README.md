@@ -2,10 +2,13 @@
 
 Lokale Sprach-Diktiersoftware für macOS als Menu-Bar-App.
 
+**Aktuelle Version:** 2.1.0
+
 - **Diktat-Modus**: Sprache → Whisper → Text in Zwischenablage (oder direkt einfügen)
 - **Überarbeitungs-Modus**: Sprache → Whisper → Apple Intelligence verfeinert → Text in Zwischenablage (oder direkt einfügen)
 - **Auto-Paste**: Text wird direkt in das zuletzt fokussierte Eingabefeld eingefügt — kein manuelles ⌘V nötig
 - **Anpassbare Prompts**: Die KI-Anweisungen für jeden Überarbeitungs-Stil sind direkt in der App editierbar
+- **System-Setup**: Mikrofon, Bedienungshilfen, Auto-Paste und Apple Intelligence an einem Ort prüfen
 - Vollständig offline nach dem ersten Modell-Download
 - Kein Cloud-Dienst, keine Datenübertragung
 
@@ -50,9 +53,9 @@ In Xcode: **Signing & Capabilities** → Team auswählen → **Cmd+R**
 | Berechtigung | Wann | Warum |
 |---|---|---|
 | **Mikrofon** | Beim ersten Drücken des Tastenkürzel | Aufnahme |
-| **Bedienungshilfen** | Beim Aktivieren von Auto-Paste in den Einstellungen | Text direkt in andere Apps einfügen |
+| **Bedienungshilfen** | Beim Aktivieren von Auto-Paste im Tab **System** | Text direkt in andere Apps einfügen |
 
-Beide Berechtigungen werden einmalig angefragt und bleiben dauerhaft gespeichert.
+Beide Berechtigungen werden einmalig angefragt und bleiben dauerhaft gespeichert. Den aktuellen Status findest du in **Einstellungen (⌘,) → System**.
 
 ---
 
@@ -92,7 +95,7 @@ Die Stil-Shortcuts (⌥1/⌥2/⌥3) wechseln automatisch in den Überarbeitungs-
 
 Mit aktiviertem Auto-Paste entfällt das manuelle ⌘V:
 
-1. **Einstellungen (⌘,) → Verhalten nach Aufnahme → „Text automatisch einfügen"** aktivieren
+1. **Einstellungen (⌘,) → System → „Text automatisch einfügen"** aktivieren
 2. Beim ersten Aktivieren öffnen sich die Systemeinstellungen → VoiceScribe unter **Bedienungshilfen** freigeben
 3. Ab sofort wird der transkribierte Text direkt in das zuletzt fokussierte Eingabefeld eingefügt
 
@@ -139,12 +142,15 @@ Die Prompts werden dauerhaft gespeichert und beim nächsten Start wiederhergeste
 
 | Einstellung | Tab | Beschreibung |
 |---|---|---|
+| Mikrofon-Freigabe | System | Status prüfen oder macOS-Datenschutzeinstellungen öffnen |
+| Bedienungshilfen | System | Erforderlich für Auto-Paste |
+| Text automatisch einfügen | System | Auto-Paste nach Transkription |
+| Apple Intelligence | System | Hinweis zur lokalen KI-Überarbeitung |
 | Tastenkürzel | Allgemein | Globales Hotkey für Aufnahme + Stil/Modus-Shortcuts |
 | Modus | Allgemein | Diktat oder Überarbeiten |
 | Standard-Stil | Allgemein | Beruflich / Locker / Mit Emojis |
 | Sprache | Allgemein | Deutsch / Englisch / Auto-Erkennung usw. |
-| Text automatisch einfügen | Allgemein | Auto-Paste nach Transkription (erfordert Bedienungshilfen-Berechtigung) |
-| Whisper-Modell | Modelle | Tiny (schnell) bis Medium (genau) |
+| Whisper-Modell | Allgemein | Tiny (schnell) bis Medium (genau) |
 | System-Prompts | Prompts | KI-Anweisungen pro Überarbeitungs-Stil frei editierbar |
 
 ---
@@ -159,7 +165,7 @@ Die Prompts werden dauerhaft gespeichert und beim nächsten Start wiederhergeste
 | Medium | ~1,5 GB | Beste Qualität, langsamer |
 
 Das Modell wird beim ersten Start automatisch heruntergeladen (Internetverbindung nötig).  
-Den Fortschritt siehst du in **Einstellungen → Modelle**:
+Den Fortschritt siehst du in **Einstellungen → Allgemein → Whisper-Modell**:
 - **Lädt herunter… X%** — einmaliger Download
 - **Modell wird kompiliert…** — einmalige CoreML-Spezialisierung für deinen Chip (~2 Min.)
 
@@ -178,7 +184,7 @@ Danach vollständig offline.
 
 ### Whisper-Modell lädt nicht
 → Internetverbindung beim ersten Start erforderlich. Danach vollständig offline.  
-→ Fortschritt in **Einstellungen (⌘,) → Tab „Modelle"** sichtbar.
+→ Fortschritt in **Einstellungen (⌘,) → Allgemein → Whisper-Modell** sichtbar.
 
 ### App erscheint nicht in der Menüleiste
 → App neu starten.
