@@ -1,6 +1,6 @@
 // SettingsView.swift
 // Settings window opened via Cmd+, or from the menu bar dropdown.
-// Three tabs: Setup, General, and Prompts.
+// Three tabs: System, General, and Prompts.
 
 import SwiftUI
 import AVFoundation
@@ -13,8 +13,8 @@ struct SettingsView: View {
 
     var body: some View {
         TabView {
-            SetupTab()
-                .tabItem { Label("Setup", systemImage: "checklist") }
+            SystemTab()
+                .tabItem { Label("System", systemImage: "checklist") }
                 .environmentObject(settings)
 
             GeneralTab()
@@ -30,9 +30,9 @@ struct SettingsView: View {
     }
 }
 
-// MARK: - Setup Tab
+// MARK: - System Tab
 
-private struct SetupTab: View {
+private struct SystemTab: View {
 
     @EnvironmentObject var settings: AppSettings
     @State private var accessibilityTrusted = AXIsProcessTrusted()
