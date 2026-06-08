@@ -2,7 +2,7 @@
 
 Lokale Sprach-Diktiersoftware für macOS als Menu-Bar-App.
 
-**Aktuelle Version:** 2.1.0
+**Aktuelle Version:** 2.1.1
 
 - **Diktat-Modus**: Sprache → Whisper → Text in Zwischenablage (oder direkt einfügen)
 - **Überarbeitungs-Modus**: Sprache → Whisper → Apple Intelligence verfeinert → Text in Zwischenablage (oder direkt einfügen)
