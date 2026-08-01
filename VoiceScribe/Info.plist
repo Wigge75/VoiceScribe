@@ -11,6 +11,11 @@
     <key>NSMicrophoneUsageDescription</key>
     <string>VoiceScribe benötigt Mikrofon-Zugriff, um deine Sprache aufzunehmen und zu transkribieren.</string>
 
+    <!-- System audio capture (Core Audio Process Tap, SPIKE — nur Debug-Builds):
+         shown on first use of AudioHardwareCreateProcessTap. -->
+    <key>NSAudioCaptureUsageDescription</key>
+    <string>VoiceScribe benötigt Zugriff auf System-Audio, um den Ton von Meeting-Apps wie Zoom oder Teams mitzuschneiden.</string>
+
     <!-- Accessibility access: shown when the app tries to insert text -->
     <key>NSAccessibilityUsageDescription</key>
     <string>VoiceScribe benötigt Bedienungshilfen-Zugriff, um transkribierten Text in das aktive Textfeld einzufügen.</string>

@@ -12,6 +12,7 @@
 		394F85C1865F7A4AE3C750A2 /* RecordingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E91DD2201760F6A3B1CC498 /* RecordingViewModel.swift */; };
 		44DD0198279F8BA2DFB761D2 /* VoiceScribeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDED3A77B6F75367CE0F14BC /* VoiceScribeApp.swift */; };
 		581C1AB71D16E61866D27CF3 /* WhisperService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 549FCC40B7CDC6D76786CEE5 /* WhisperService.swift */; };
+		C7728595962F993953BB6814 /* SystemAudioTapSpike.swift in Sources */ = {isa = PBXBuildFile; fileRef = F138FF6A1BBF0A364928DB8E /* SystemAudioTapSpike.swift */; };
 		5E05C8A1263E899C7FE0F85A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43888034F056F1C8451D27E /* AppDelegate.swift */; };
 		6D74D383032C2CF625109A38 /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDFABD47D23EDBF2D3075093 /* AudioRecorder.swift */; };
 		6E34390B170556A5A53B06DE /* HUDController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75B933648E95737B0CFD681 /* HUDController.swift */; };
@@ -33,6 +34,7 @@
 		3D9986D7A29195C77A8B1A44 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		4E91DD2201760F6A3B1CC498 /* RecordingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingViewModel.swift; sourceTree = "<group>"; };
 		549FCC40B7CDC6D76786CEE5 /* WhisperService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperService.swift; sourceTree = "<group>"; };
+		F138FF6A1BBF0A364928DB8E /* SystemAudioTapSpike.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemAudioTapSpike.swift; sourceTree = "<group>"; };
 		601C21271656CC3CA72CCC83 /* FoundationModelService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationModelService.swift; sourceTree = "<group>"; };
 		17f02011ab0346fd91c8d4f69bc630eb /* HistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntry.swift; sourceTree = "<group>"; };
 		c12c7633cc014715ac3064e9a777a1f3 /* HistoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryService.swift; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 				BDFABD47D23EDBF2D3075093 /* AudioRecorder.swift */,
 				601C21271656CC3CA72CCC83 /* FoundationModelService.swift */,
 				c12c7633cc014715ac3064e9a777a1f3 /* HistoryService.swift */,
+				F138FF6A1BBF0A364928DB8E /* SystemAudioTapSpike.swift */,
 				549FCC40B7CDC6D76786CEE5 /* WhisperService.swift */,
 			);
 			path = Services;
@@ -240,6 +243,7 @@
 				44DD0198279F8BA2DFB761D2 /* VoiceScribeApp.swift in Sources */,
 				F08E062D03534D46CD61E8B1 /* WaveformView.swift in Sources */,
 				581C1AB71D16E61866D27CF3 /* WhisperService.swift in Sources */,
+				C7728595962F993953BB6814 /* SystemAudioTapSpike.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

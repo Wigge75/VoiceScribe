@@ -71,6 +71,13 @@ struct MenuBarMenuView: View {
         }
         .keyboardShortcut("q", modifiers: .command)
 
+        #if DEBUG
+        if #available(macOS 14.2, *) {
+            Divider()
+            SystemAudioTapSpikeMenuItem()
+        }
+        #endif
+
         Divider()
 
         Text("Version \(AppSettings.appVersion)")
@@ -78,3 +85,27 @@ struct MenuBarMenuView: View {
             .font(.caption)
     }
 }
+
+// MARK: - Debug Spike: System-Audio-Tap
+
+#if DEBUG
+/// Temporärer Debug-Menüpunkt zum manuellen Testen von SystemAudioTapSpike.
+/// Nur in Debug-Builds sichtbar. Siehe Services/SystemAudioTapSpike.swift.
+@available(macOS 14.2, *)
+private struct SystemAudioTapSpikeMenuItem: View {
+    @StateObject private var spike = SystemAudioTapSpike()
+
+    var body: some View {
+        Text("Spike: \(spike.statusText)")
+            .foregroundStyle(.secondary)
+
+        Button(spike.isRunning ? "System-Audio-Tap stoppen" : "System-Audio-Tap starten") {
+            if spike.isRunning {
+                spike.stop()
+            } else {
+                spike.start()
+            }
+        }
+    }
+}
+#endif
