@@ -253,7 +253,7 @@ private struct GeneralTab: View {
                         .environmentObject(viewModel)
                 }
 
-                Text("Das Modell wird beim ersten Mal automatisch heruntergeladen (~300 MB für Base).")
+                Text("Das Modell wird beim ersten Mal automatisch heruntergeladen (~216 MB für Ausgewogen).")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

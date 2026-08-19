@@ -42,17 +42,15 @@ enum RevisionStyle: String, CaseIterable, Identifiable, Codable {
 }
 
 enum WhisperModelSize: String, CaseIterable, Identifiable {
-    case tiny   = "tiny"
-    case base   = "base"
-    case small  = "small"
-    case medium = "medium"
+    case fast     = "tiny"
+    case balanced = "small_216MB"
+    case best     = "large-v3-v20240930_turbo_632MB"
 
     var displayName: String {
         switch self {
-        case .tiny:   return "Tiny (~150 MB, schnellste)"
-        case .base:   return "Base (~300 MB, schnell)"
-        case .small:  return "Small (~500 MB, gut)"
-        case .medium: return "Medium (~1.5 GB, beste Qualität)"
+        case .fast:     return "Schnell (~150 MB)"
+        case .balanced: return "Ausgewogen (~216 MB)"
+        case .best:     return "Beste Qualität (~632 MB)"
         }
     }
 
@@ -140,7 +138,7 @@ final class AppSettings: ObservableObject {
     private init() {
         let defaults = UserDefaults.standard
         mode = RecordingMode(rawValue: defaults.string(forKey: Keys.mode) ?? "") ?? .dictation
-        whisperModel = WhisperModelSize(rawValue: defaults.string(forKey: Keys.whisperModel) ?? "") ?? .small
+        whisperModel = WhisperModelSize(rawValue: defaults.string(forKey: Keys.whisperModel) ?? "") ?? .balanced
         language = defaults.string(forKey: Keys.language) ?? "de"
         revisionStyle = RevisionStyle(rawValue: defaults.string(forKey: Keys.revisionStyle) ?? "") ?? .beruflich
         autoPaste = defaults.bool(forKey: Keys.autoPaste)

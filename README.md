@@ -150,7 +150,7 @@ Die Prompts werden dauerhaft gespeichert und beim nächsten Start wiederhergeste
 | Modus | Allgemein | Diktat oder Überarbeiten |
 | Standard-Stil | Allgemein | Beruflich / Locker / Mit Emojis |
 | Sprache | Allgemein | Deutsch / Englisch / Auto-Erkennung usw. |
-| Whisper-Modell | Allgemein | Tiny (schnell) bis Medium (genau) |
+| Whisper-Modell | Allgemein | Schnell bis Beste Qualität |
 | System-Prompts | Prompts | KI-Anweisungen pro Überarbeitungs-Stil frei editierbar |
 
 ---
@@ -159,10 +159,9 @@ Die Prompts werden dauerhaft gespeichert und beim nächsten Start wiederhergeste
 
 | Modell | Größe | Empfehlung |
 |---|---|---|
-| Tiny | ~150 MB | Sehr schnell, ausreichend für einfache Texte |
-| Base | ~300 MB | Gute Balance aus Geschwindigkeit und Qualität |
-| Small | ~500 MB | Empfohlen für normale Nutzung |
-| Medium | ~1,5 GB | Beste Qualität, langsamer |
+| Schnell | ~150 MB | Sehr schnell, ausreichend für einfache Texte |
+| Ausgewogen | ~216 MB | Empfohlen für normale Nutzung |
+| Beste Qualität | ~632 MB | Höchste Genauigkeit, etwas langsamer |
 
 Das Modell wird beim ersten Start automatisch heruntergeladen (Internetverbindung nötig).  
 Den Fortschritt siehst du in **Einstellungen → Allgemein → Whisper-Modell**:
