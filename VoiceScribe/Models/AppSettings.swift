@@ -63,7 +63,7 @@ enum WhisperModelSize: String, CaseIterable, Identifiable {
 /// Persists to UserDefaults and notifies observers via Combine.
 final class AppSettings: ObservableObject {
 
-    static let appVersion = "2.1.3"
+    static let appVersion = "2.1.4"
 
     static let shared = AppSettings()
 
