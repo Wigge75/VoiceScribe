@@ -15,9 +15,16 @@ actor HistoryService {
         return dir.appendingPathComponent("history.json")
     }
 
+    /// Verlauf wird in der Menüleiste angezeigt (max. 10 sichtbar) — ursprünglich
+    /// unbegrenzt für interne Prompt-Qualitätskontrolle, die nicht mehr gebraucht wird.
+    private static let maxEntries = 10
+
     func append(_ entry: HistoryEntry) {
         var entries = load()
         entries.insert(entry, at: 0)
+        if entries.count > Self.maxEntries {
+            entries.removeLast(entries.count - Self.maxEntries)
+        }
         save(entries)
     }
 

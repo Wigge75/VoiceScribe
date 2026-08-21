@@ -46,6 +46,7 @@ final class RecordingViewModel: ObservableObject {
     // Published state drives all UI
     @Published var state: RecordingState = .idle
     @Published var audioLevel: AudioLevel = AudioLevel(averageDB: -160, peakDB: -160)
+    @Published var recentHistory: [HistoryEntry] = []
 
     // Services — all created once and reused
     let audioRecorder  = AudioRecorder()
@@ -58,6 +59,16 @@ final class RecordingViewModel: ObservableObject {
     private var currentTask: Task<Void, Never>?
 
     private static let concealedPasteboardType = NSPasteboard.PasteboardType("org.nspasteboard.ConcealedType")
+
+    /// Schreibt `text` als "concealed" auf die Zwischenablage, damit Clipboard-Manager
+    /// (Alfred, Raycast, …) den Inhalt überspringen. Von der Live-Pipeline und vom
+    /// Verlauf-Kopieren genutzt.
+    private func copyToConcealedPasteboard(_ text: String) {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.declareTypes([.string, Self.concealedPasteboardType], owner: nil)
+        NSPasteboard.general.setString(text, forType: .string)
+        NSPasteboard.general.setString("", forType: Self.concealedPasteboardType)
+    }
 
     private var pendingRecordingURL: URL?
     private var recordingStartTime: Date? = nil
@@ -125,6 +136,8 @@ final class RecordingViewModel: ObservableObject {
 
         Task {
             await whisperService.loadModel(settings.whisperModel.rawValue)
+            let history = await HistoryService.shared.load()
+            recentHistory = Array(history.prefix(10))
         }
     }
 
@@ -182,6 +195,12 @@ final class RecordingViewModel: ObservableObject {
 
     func reloadWhisperModel() {
         Task { await whisperService.loadModel(settings.whisperModel.rawValue) }
+    }
+
+    /// Kopiert das Ergebnis eines früheren Verlauf-Eintrags erneut in die Zwischenablage.
+    /// Bewusst kein Auto-Paste — nur Kopieren.
+    func copyHistoryEntryToClipboard(_ entry: HistoryEntry) {
+        copyToConcealedPasteboard(entry.result)
     }
 
     // MARK: - Import
@@ -349,10 +368,7 @@ final class RecordingViewModel: ObservableObject {
                 }
             }
 
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.declareTypes([.string, Self.concealedPasteboardType], owner: nil)
-            NSPasteboard.general.setString(finalText, forType: .string)
-            NSPasteboard.general.setString("", forType: Self.concealedPasteboardType)
+            copyToConcealedPasteboard(finalText)
 
             if settings.autoPaste {
                 pasteAtCursor(target: pasteTarget)
@@ -360,12 +376,14 @@ final class RecordingViewModel: ObservableObject {
             pasteTarget = nil
 
             Task {
-                await HistoryService.shared.append(HistoryEntry(
+                let entry = HistoryEntry(
                     mode:       capturedMode,
                     style:      capturedMode == .revision ? capturedStyle : nil,
                     transcript: transcribed,
                     result:     finalText
-                ))
+                )
+                await HistoryService.shared.append(entry)
+                recentHistory = Array(await HistoryService.shared.load().prefix(10))
             }
 
             let previewBase = String(finalText.prefix(40))
