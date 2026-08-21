@@ -8,6 +8,7 @@ import AVFoundation
 import AppKit
 import Combine
 import KeyboardShortcuts
+import UniformTypeIdentifiers
 
 // MARK: - Recording State
 
@@ -25,6 +26,16 @@ enum RecordingState {
 private struct PasteTarget {
     let processIdentifier: pid_t
     let application: NSRunningApplication
+}
+
+// MARK: - Import Errors
+
+private enum ImportError: LocalizedError {
+    case audioExtractionFailed
+
+    var errorDescription: String? {
+        "Audiospur konnte nicht aus der Datei extrahiert werden"
+    }
 }
 
 // MARK: - RecordingViewModel
@@ -124,6 +135,11 @@ final class RecordingViewModel: ObservableObject {
         return false
     }
 
+    var canImport: Bool {
+        if case .idle = state { return true }
+        return false
+    }
+
     var statusSummary: String {
         switch state {
         case .idle:              return "Halten für Aufnahme (⌥Space)"
@@ -166,6 +182,82 @@ final class RecordingViewModel: ObservableObject {
 
     func reloadWhisperModel() {
         Task { await whisperService.loadModel(settings.whisperModel.rawValue) }
+    }
+
+    // MARK: - Import
+
+    /// Opens a file picker for an existing audio or video (e.g. screen recording) file
+    /// and runs it through the same transcription/revision pipeline used for
+    /// live recordings. Unlike live recordings, the source file is never deleted.
+    func importAudioFile() {
+        guard canImport else { return }
+
+        // Merkt sich die zuvor aktive App, damit Auto-Paste nach der Verarbeitung
+        // wie bei Live-Aufnahmen dorthin einfügt (sonst bleibt pasteTarget nil).
+        pasteTarget = captureFrontmostApp()
+
+        let panel = NSOpenPanel()
+        panel.title = "Audiodatei importieren"
+        panel.allowedContentTypes = [.audio, .mpeg4Movie, .quickTimeMovie]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+
+        guard panel.runModal() == .OK, let url = panel.url else {
+            pasteTarget = nil
+            return
+        }
+
+        panelController.show(viewModel: self)
+        panelController.resize(to: 160)
+        currentTask = Task {
+            await runImportPipeline(sourceURL: url)
+        }
+    }
+
+    /// WhisperKit liest Audio über AVAudioFile, das reine Video-Container (.mov/.mp4)
+    /// nicht öffnen kann. Enthält die importierte Datei eine Videospur, wird die
+    /// Audiospur zuerst in eine temporäre .m4a-Datei extrahiert.
+    private func runImportPipeline(sourceURL: URL) async {
+        do {
+            let audioURL = try await extractedAudioURL(from: sourceURL)
+            let isTemporary = audioURL != sourceURL
+            defer {
+                if isTemporary {
+                    try? FileManager.default.removeItem(at: audioURL)
+                }
+            }
+            await pipeline(fileURL: audioURL, cleanupAfter: false)
+        } catch {
+            state = .error(error.localizedDescription)
+            panelController.resize(to: 160)
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            panelController.hide()
+            state = .idle
+        }
+    }
+
+    /// Gibt `sourceURL` unverändert zurück, wenn die Datei keine Videospur enthält.
+    /// Andernfalls wird die Audiospur nach .m4a exportiert und die temporäre URL
+    /// zurückgegeben (vom Aufrufer nach Gebrauch zu löschen).
+    private func extractedAudioURL(from sourceURL: URL) async throws -> URL {
+        let asset = AVURLAsset(url: sourceURL)
+        let videoTracks = try await asset.loadTracks(withMediaType: .video)
+        guard !videoTracks.isEmpty else { return sourceURL }
+
+        guard let export = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetAppleM4A) else {
+            throw ImportError.audioExtractionFailed
+        }
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension("m4a")
+        export.outputURL = tempURL
+        export.outputFileType = .m4a
+
+        try await export.export()
+        guard export.status == .completed else {
+            throw export.error ?? ImportError.audioExtractionFailed
+        }
+        return tempURL
     }
 
     // MARK: - Recording
@@ -213,9 +305,11 @@ final class RecordingViewModel: ObservableObject {
 
     // MARK: - Pipeline
 
-    private func pipeline(fileURL: URL) async {
+    private func pipeline(fileURL: URL, cleanupAfter: Bool = true) async {
         defer {
-            audioRecorder.cleanupTempFile(at: fileURL)
+            if cleanupAfter {
+                audioRecorder.cleanupTempFile(at: fileURL)
+            }
         }
 
         do {
