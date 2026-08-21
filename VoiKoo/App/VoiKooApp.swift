@@ -1,4 +1,4 @@
-// VoiceScribeApp.swift
+// VoiKooApp.swift
 // App entry point. Sets up the menu bar icon, the floating recording panel,
 // and the Settings window.
 
@@ -6,13 +6,13 @@ import SwiftUI
 import KeyboardShortcuts
 
 @main
-struct VoiceScribeApp: App {
+struct VoiKooApp: App {
 
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var viewModel = RecordingViewModel()
 
     var body: some Scene {
-        MenuBarExtra("VoiceScribe", systemImage: viewModel.menuBarIconName) {
+        MenuBarExtra("VoiKoo", systemImage: viewModel.menuBarIconName) {
             MenuBarMenuView()
                 .environmentObject(viewModel)
                 .environmentObject(AppSettings.shared)
@@ -71,7 +71,7 @@ struct MenuBarMenuView: View {
         }
         .keyboardShortcut(",", modifiers: .command)
 
-        Button("VoiceScribe beenden") {
+        Button("VoiKoo beenden") {
             NSApplication.shared.terminate(nil)
         }
         .keyboardShortcut("q", modifiers: .command)

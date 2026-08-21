@@ -393,14 +393,14 @@ final class RecordingViewModel: ObservableObject {
     private func performRevision(of text: String) async -> (revised: String, didRevise: Bool) {
         let service = FoundationModelService()
         guard service.isAvailable() else {
-            print("[VoiceScribe] Apple Intelligence nicht verfügbar: \(service.unavailabilityReason())")
+            print("[VoiKoo] Apple Intelligence nicht verfügbar: \(service.unavailabilityReason())")
             return (text, false)
         }
         do {
             let result = try await service.revise(text: text, systemPrompt: settings.prompt(for: settings.revisionStyle))
             return (result, true)
         } catch {
-            print("[VoiceScribe] Apple Intelligence Fehler: \(error)")
+            print("[VoiKoo] Apple Intelligence Fehler: \(error)")
             return (text, false)
         }
     }

@@ -9,11 +9,11 @@
 
     <!-- Microphone access: shown to user on first recording attempt -->
     <key>NSMicrophoneUsageDescription</key>
-    <string>VoiceScribe benötigt Mikrofon-Zugriff, um deine Sprache aufzunehmen und zu transkribieren.</string>
+    <string>VoiKoo benötigt Mikrofon-Zugriff, um deine Sprache aufzunehmen und zu transkribieren.</string>
 
     <!-- Accessibility access: shown when the app tries to insert text -->
     <key>NSAccessibilityUsageDescription</key>
-    <string>VoiceScribe benötigt Bedienungshilfen-Zugriff, um transkribierten Text in das aktive Textfeld einzufügen.</string>
+    <string>VoiKoo benötigt Bedienungshilfen-Zugriff, um transkribierten Text in das aktive Textfeld einzufügen.</string>
 
     <!-- Allow HTTP connections to Ollama running on localhost -->
     <key>NSAppTransportSecurity</key>
@@ -24,11 +24,11 @@
 
     <!-- Standard bundle metadata -->
     <key>CFBundleIdentifier</key>
-    <string>com.stefanwiggeshoff.VoiceScribe</string>
+    <string>com.stefanwiggeshoff.VoiKoo</string>
     <key>CFBundleName</key>
-    <string>VoiceScribe</string>
+    <string>VoiKoo</string>
     <key>CFBundleDisplayName</key>
-    <string>VoiceScribe</string>
+    <string>VoiKoo</string>
     <key>CFBundleShortVersionString</key>
     <string>2.1.4</string>
     <key>CFBundleVersion</key>

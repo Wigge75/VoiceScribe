@@ -1,4 +1,4 @@
-name: VoiceScribe
+name: VoiKoo
 
 options:
   bundleIdPrefix: com.stefanwiggeshoff
@@ -21,16 +21,16 @@ packages:
     from: "2.2.0"
 
 targets:
-  VoiceScribe:
+  VoiKoo:
     type: application
     platform: macOS
     deploymentTarget: "14.0"
     sources:
-      - path: VoiceScribe
+      - path: VoiKoo
         excludes:
           - "**/*.md"
     resources:
-      - path: VoiceScribe/Resources
+      - path: VoiKoo/Resources
     dependencies:
       - package: WhisperKit
         product: WhisperKit
@@ -38,12 +38,12 @@ targets:
         product: KeyboardShortcuts
     settings:
       base:
-        PRODUCT_NAME: VoiceScribe
-        PRODUCT_BUNDLE_IDENTIFIER: com.stefanwiggeshoff.VoiceScribe
+        PRODUCT_NAME: VoiKoo
+        PRODUCT_BUNDLE_IDENTIFIER: com.stefanwiggeshoff.VoiKoo
         SWIFT_VERSION: "5.9"
         MACOSX_DEPLOYMENT_TARGET: "14.0"
-        INFOPLIST_FILE: VoiceScribe/Info.plist
-        CODE_SIGN_ENTITLEMENTS: VoiceScribe/VoiceScribe.entitlements
+        INFOPLIST_FILE: VoiKoo/Info.plist
+        CODE_SIGN_ENTITLEMENTS: VoiKoo/VoiKoo.entitlements
         ENABLE_HARDENED_RUNTIME: YES
         # Menu bar apps don't need a dock icon
         # LSUIElement in Info.plist handles this, but setting the app category
@@ -59,10 +59,10 @@ targets:
           SWIFT_ACTIVE_COMPILATION_CONDITIONS: ""
 
 schemes:
-  VoiceScribe:
+  VoiKoo:
     build:
       targets:
-        VoiceScribe: all
+        VoiKoo: all
     run:
       config: Debug
     archive:

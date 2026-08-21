@@ -15,10 +15,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BCD4DF1CD21E3AEAD2A3576C"
-               BuildableName = "VoiceScribe.app"
-               BlueprintName = "VoiceScribe"
-               ReferencedContainer = "container:VoiceScribe.xcodeproj">
+               BlueprintIdentifier = "F41C79B3802E708612D25A3A"
+               BuildableName = "VoiKoo.app"
+               BlueprintName = "VoiKoo"
+               ReferencedContainer = "container:VoiKoo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,10 +32,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BCD4DF1CD21E3AEAD2A3576C"
-            BuildableName = "VoiceScribe.app"
-            BlueprintName = "VoiceScribe"
-            ReferencedContainer = "container:VoiceScribe.xcodeproj">
+            BlueprintIdentifier = "F41C79B3802E708612D25A3A"
+            BuildableName = "VoiKoo.app"
+            BlueprintName = "VoiKoo"
+            ReferencedContainer = "container:VoiKoo.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -55,10 +55,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BCD4DF1CD21E3AEAD2A3576C"
-            BuildableName = "VoiceScribe.app"
-            BlueprintName = "VoiceScribe"
-            ReferencedContainer = "container:VoiceScribe.xcodeproj">
+            BlueprintIdentifier = "F41C79B3802E708612D25A3A"
+            BuildableName = "VoiKoo.app"
+            BlueprintName = "VoiKoo"
+            ReferencedContainer = "container:VoiKoo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
@@ -74,10 +74,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BCD4DF1CD21E3AEAD2A3576C"
-            BuildableName = "VoiceScribe.app"
-            BlueprintName = "VoiceScribe"
-            ReferencedContainer = "container:VoiceScribe.xcodeproj">
+            BlueprintIdentifier = "F41C79B3802E708612D25A3A"
+            BuildableName = "VoiKoo.app"
+            BlueprintName = "VoiKoo"
+            ReferencedContainer = "container:VoiKoo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

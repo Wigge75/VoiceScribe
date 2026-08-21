@@ -1,0 +1,471 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		16DC5CDB79A569C56D63EF02 /* WhisperService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62044985D3B0E2308534CD7 /* WhisperService.swift */; };
+		1D12FDB80AC5B00BCE370C41 /* HistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B23EE6508B554627FD6319B /* HistoryEntry.swift */; };
+		33AFB3E1C7EB3AE4DFF61900 /* HistoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE5CAC6DFAA826657BC868F5 /* HistoryService.swift */; };
+		3407071C4135DA14C972D0EC /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = D1BF80DB6A21BD01ED9ED2F4 /* WhisperKit */; };
+		3B9807A5E227FC0AB2483DC3 /* RecordingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7273195C842DCC9E998E412F /* RecordingViewModel.swift */; };
+		42D11A9817B091DFB115B6E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5974658A482602C855BD919C /* Assets.xcassets */; };
+		4CBF9BEA8028A76396ED3DB4 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82E1450670B625033018E4AB /* AppSettings.swift */; };
+		7173FEA970C0404C343CBA77 /* RevisionStyle+UI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6729A439A29AFA101FE9BFFF /* RevisionStyle+UI.swift */; };
+		7BF5CE142E717C9E24FCBAE7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA8A9DB7409B6B211A27E60 /* AppDelegate.swift */; };
+		89D898510BD52D4DE897DFE4 /* WaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516EAC96F691A3991CCFE08B /* WaveformView.swift */; };
+		A14BD29E00078467DC062A7A /* HUDController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266BED74EBC534E518FD7FA7 /* HUDController.swift */; };
+		AB63C2025B903CC9048A7A48 /* FoundationModelService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B2DCACC9AD8D72DD1F3E7C3 /* FoundationModelService.swift */; };
+		B19FBACBE09F6015A9571E06 /* VoiKooApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6049C47A2F68437686614803 /* VoiKooApp.swift */; };
+		BE9979AC78F77EF177A9D8AE /* RecordingPanelContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42B687CD5D7F7F7AA88CF7BD /* RecordingPanelContent.swift */; };
+		CCF658D476569563182E79DD /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E757ACAF1C35C3BEFA07E2C7 /* AudioRecorder.swift */; };
+		DF1214EDD4B87FDDF0B35A51 /* RecordingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCEEF97F7203D79849BF05BA /* RecordingPanel.swift */; };
+		DFDF8092BEDEFA67C0C68633 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 527DF4E17F2FBEF17D414B28 /* KeyboardShortcuts */; };
+		E7E4E51D59DF7357DE4C3168 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 996C07247C4EE39F37F6C725 /* SettingsView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		266BED74EBC534E518FD7FA7 /* HUDController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUDController.swift; sourceTree = "<group>"; };
+		42B687CD5D7F7F7AA88CF7BD /* RecordingPanelContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingPanelContent.swift; sourceTree = "<group>"; };
+		516EAC96F691A3991CCFE08B /* WaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformView.swift; sourceTree = "<group>"; };
+		5974658A482602C855BD919C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		6049C47A2F68437686614803 /* VoiKooApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiKooApp.swift; sourceTree = "<group>"; };
+		6729A439A29AFA101FE9BFFF /* RevisionStyle+UI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RevisionStyle+UI.swift"; sourceTree = "<group>"; };
+		7273195C842DCC9E998E412F /* RecordingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingViewModel.swift; sourceTree = "<group>"; };
+		7B2DCACC9AD8D72DD1F3E7C3 /* FoundationModelService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationModelService.swift; sourceTree = "<group>"; };
+		82E1450670B625033018E4AB /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		996C07247C4EE39F37F6C725 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		9B23EE6508B554627FD6319B /* HistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntry.swift; sourceTree = "<group>"; };
+		B62044985D3B0E2308534CD7 /* WhisperService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperService.swift; sourceTree = "<group>"; };
+		BA1164C818F8405FAE96CE13 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		D480D293C187D1FE6C253B88 /* VoiKoo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VoiKoo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBA8A9DB7409B6B211A27E60 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		E757ACAF1C35C3BEFA07E2C7 /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
+		EE5CAC6DFAA826657BC868F5 /* HistoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryService.swift; sourceTree = "<group>"; };
+		FCEEF97F7203D79849BF05BA /* RecordingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingPanel.swift; sourceTree = "<group>"; };
+		FDF0FEC3079C7A5BB4AA1741 /* VoiKoo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VoiKoo.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B405C7910D81EFAEA3659EB2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3407071C4135DA14C972D0EC /* WhisperKit in Frameworks */,
+				DFDF8092BEDEFA67C0C68633 /* KeyboardShortcuts in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		10A75633A81126148C943D07 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				E757ACAF1C35C3BEFA07E2C7 /* AudioRecorder.swift */,
+				7B2DCACC9AD8D72DD1F3E7C3 /* FoundationModelService.swift */,
+				EE5CAC6DFAA826657BC868F5 /* HistoryService.swift */,
+				B62044985D3B0E2308534CD7 /* WhisperService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		367CE191B2FCBEC6D95E676D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D480D293C187D1FE6C253B88 /* VoiKoo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		414EDB2A37A3015F3DBB3D46 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				DBA8A9DB7409B6B211A27E60 /* AppDelegate.swift */,
+				6049C47A2F68437686614803 /* VoiKooApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		44801EFDD9C3B8E60B146269 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				7273195C842DCC9E998E412F /* RecordingViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		6888F5B29AB232BC5D626909 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				266BED74EBC534E518FD7FA7 /* HUDController.swift */,
+				FCEEF97F7203D79849BF05BA /* RecordingPanel.swift */,
+				42B687CD5D7F7F7AA88CF7BD /* RecordingPanelContent.swift */,
+				6729A439A29AFA101FE9BFFF /* RevisionStyle+UI.swift */,
+				996C07247C4EE39F37F6C725 /* SettingsView.swift */,
+				516EAC96F691A3991CCFE08B /* WaveformView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		711DA02B972CE1196EBB3483 = {
+			isa = PBXGroup;
+			children = (
+				FAC9F64F2FE25EB20774510B /* VoiKoo */,
+				367CE191B2FCBEC6D95E676D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DE1AF03BC706697A1EDD4B0E /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				82E1450670B625033018E4AB /* AppSettings.swift */,
+				9B23EE6508B554627FD6319B /* HistoryEntry.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		F5734767F9F0B01A28C16F96 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				5974658A482602C855BD919C /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		FAC9F64F2FE25EB20774510B /* VoiKoo */ = {
+			isa = PBXGroup;
+			children = (
+				BA1164C818F8405FAE96CE13 /* Info.plist */,
+				FDF0FEC3079C7A5BB4AA1741 /* VoiKoo.entitlements */,
+				414EDB2A37A3015F3DBB3D46 /* App */,
+				DE1AF03BC706697A1EDD4B0E /* Models */,
+				F5734767F9F0B01A28C16F96 /* Resources */,
+				10A75633A81126148C943D07 /* Services */,
+				44801EFDD9C3B8E60B146269 /* ViewModels */,
+				6888F5B29AB232BC5D626909 /* Views */,
+			);
+			path = VoiKoo;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F41C79B3802E708612D25A3A /* VoiKoo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E9BEB9B73DD161FEB7A10608 /* Build configuration list for PBXNativeTarget "VoiKoo" */;
+			buildPhases = (
+				FD566740BC163DD6F8BA708F /* Sources */,
+				50410642D5074D618BF264F1 /* Resources */,
+				B405C7910D81EFAEA3659EB2 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = VoiKoo;
+			packageProductDependencies = (
+				D1BF80DB6A21BD01ED9ED2F4 /* WhisperKit */,
+				527DF4E17F2FBEF17D414B28 /* KeyboardShortcuts */,
+			);
+			productName = VoiKoo;
+			productReference = D480D293C187D1FE6C253B88 /* VoiKoo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		41A0184F068549E408A544BD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = E4CC0095343914920BE531C8 /* Build configuration list for PBXProject "VoiKoo" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 711DA02B972CE1196EBB3483;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				3320F3D93A78FCBB3AABDDE5 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				5DBC224B218EB03B948E253D /* XCRemoteSwiftPackageReference "WhisperKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 367CE191B2FCBEC6D95E676D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F41C79B3802E708612D25A3A /* VoiKoo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		50410642D5074D618BF264F1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				42D11A9817B091DFB115B6E4 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FD566740BC163DD6F8BA708F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7BF5CE142E717C9E24FCBAE7 /* AppDelegate.swift in Sources */,
+				4CBF9BEA8028A76396ED3DB4 /* AppSettings.swift in Sources */,
+				CCF658D476569563182E79DD /* AudioRecorder.swift in Sources */,
+				AB63C2025B903CC9048A7A48 /* FoundationModelService.swift in Sources */,
+				A14BD29E00078467DC062A7A /* HUDController.swift in Sources */,
+				1D12FDB80AC5B00BCE370C41 /* HistoryEntry.swift in Sources */,
+				33AFB3E1C7EB3AE4DFF61900 /* HistoryService.swift in Sources */,
+				DF1214EDD4B87FDDF0B35A51 /* RecordingPanel.swift in Sources */,
+				BE9979AC78F77EF177A9D8AE /* RecordingPanelContent.swift in Sources */,
+				3B9807A5E227FC0AB2483DC3 /* RecordingViewModel.swift in Sources */,
+				7173FEA970C0404C343CBA77 /* RevisionStyle+UI.swift in Sources */,
+				E7E4E51D59DF7357DE4C3168 /* SettingsView.swift in Sources */,
+				B19FBACBE09F6015A9571E06 /* VoiKooApp.swift in Sources */,
+				89D898510BD52D4DE897DFE4 /* WaveformView.swift in Sources */,
+				16DC5CDB79A569C56D63EF02 /* WhisperService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		5DF4B57684DF0F35EC660E31 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		AE3AD0B0267DE21F548CABF3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = VoiKoo/VoiKoo.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = VoiKoo/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.stefanwiggeshoff.VoiKoo;
+				PRODUCT_NAME = VoiKoo;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		BC6E79274A1BCD47033BA0E5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = VoiKoo/VoiKoo.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = VoiKoo/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.stefanwiggeshoff.VoiKoo;
+				PRODUCT_NAME = VoiKoo;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		FFC998AAA91427F56EFF2CCD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E4CC0095343914920BE531C8 /* Build configuration list for PBXProject "VoiKoo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5DF4B57684DF0F35EC660E31 /* Debug */,
+				FFC998AAA91427F56EFF2CCD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E9BEB9B73DD161FEB7A10608 /* Build configuration list for PBXNativeTarget "VoiKoo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC6E79274A1BCD47033BA0E5 /* Debug */,
+				AE3AD0B0267DE21F548CABF3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3320F3D93A78FCBB3AABDDE5 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.0;
+			};
+		};
+		5DBC224B218EB03B948E253D /* XCRemoteSwiftPackageReference "WhisperKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/argmaxinc/WhisperKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		527DF4E17F2FBEF17D414B28 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3320F3D93A78FCBB3AABDDE5 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
+		D1BF80DB6A21BD01ED9ED2F4 /* WhisperKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5DBC224B218EB03B948E253D /* XCRemoteSwiftPackageReference "WhisperKit" */;
+			productName = WhisperKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 41A0184F068549E408A544BD /* Project object */;
+}

@@ -40,8 +40,8 @@ private struct SystemTab: View {
 
     var body: some View {
         Form {
-            Section("VoiceScribe einrichten") {
-                Text("Für die beste Nutzung braucht VoiceScribe Mikrofon-Zugriff. Automatisches Einfügen benötigt zusätzlich Bedienungshilfen.")
+            Section("VoiKoo einrichten") {
+                Text("Für die beste Nutzung braucht VoiKoo Mikrofon-Zugriff. Automatisches Einfügen benötigt zusätzlich Bedienungshilfen.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -57,7 +57,7 @@ private struct SystemTab: View {
 
                 SetupStatusRow(
                     title: "Bedienungshilfen",
-                    detail: "Erlaubt VoiceScribe, den transkribierten Text per Cmd+V in das zuletzt fokussierte Textfeld einzufügen.",
+                    detail: "Erlaubt VoiKoo, den transkribierten Text per Cmd+V in das zuletzt fokussierte Textfeld einzufügen.",
                     isReady: accessibilityTrusted,
                     actionTitle: "Einstellungen öffnen",
                     action: openAccessibilitySettings
@@ -94,11 +94,11 @@ private struct SystemTab: View {
     private var microphoneDetail: String {
         switch microphoneStatus {
         case .authorized:
-            return "VoiceScribe darf dein Mikrofon für Aufnahmen verwenden."
+            return "VoiKoo darf dein Mikrofon für Aufnahmen verwenden."
         case .denied, .restricted:
             return "Der Mikrofon-Zugriff ist gesperrt. Bitte in den Systemeinstellungen erlauben."
         case .notDetermined:
-            return "VoiceScribe fragt beim ersten Aufnehmen nach Mikrofon-Zugriff."
+            return "VoiKoo fragt beim ersten Aufnehmen nach Mikrofon-Zugriff."
         @unknown default:
             return "Der aktuelle Mikrofon-Status konnte nicht eindeutig gelesen werden."
         }

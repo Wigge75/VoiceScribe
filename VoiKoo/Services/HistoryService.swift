@@ -1,6 +1,6 @@
 // HistoryService.swift
 // Schreibt jeden Transkriptions-/Überarbeitungsvorgang in eine JSON-Datei auf der Festplatte.
-// Speicherort: ~/Library/Application Support/VoiceScribe/history.json
+// Speicherort: ~/Library/Application Support/VoiKoo/history.json
 
 import Foundation
 
@@ -10,7 +10,7 @@ actor HistoryService {
     private var fileURL: URL {
         let dir = FileManager.default
             .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("VoiceScribe")
+            .appendingPathComponent("VoiKoo")
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir.appendingPathComponent("history.json")
     }

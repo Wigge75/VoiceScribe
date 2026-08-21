@@ -1,4 +1,4 @@
-# VoiceScribe
+# VoiKoo
 
 Lokale Sprach-Diktiersoftware für macOS als Menu-Bar-App.
 
@@ -30,18 +30,18 @@ Lokale Sprach-Diktiersoftware für macOS als Menu-Bar-App.
 
 ### Einfach: Fertiger Download (empfohlen)
 
-1. [Neueste Version herunterladen](https://github.com/Wigge75/VoiceScribe/releases/latest) → **VoiceScribe.zip**
-2. ZIP entpacken → `VoiceScribe.app` in den Ordner `/Programme` ziehen
+1. [Neueste Version herunterladen](https://github.com/Wigge75/VoiKoo/releases/latest) → **VoiKoo.zip**
+2. ZIP entpacken → `VoiKoo.app` in den Ordner `/Programme` ziehen
 3. Beim ersten Start: **Rechtsklick → Öffnen** — oder Systemeinstellungen → Datenschutz & Sicherheit → „Trotzdem öffnen"
 
-> **Warum die Sicherheitswarnung?** macOS warnt bei Apps, die nicht über den App Store verteilt werden. VoiceScribe läuft vollständig lokal — keine Daten verlassen deinen Mac.
+> **Warum die Sicherheitswarnung?** macOS warnt bei Apps, die nicht über den App Store verteilt werden. VoiKoo läuft vollständig lokal — keine Daten verlassen deinen Mac.
 
 ### Aus dem Quellcode bauen
 
 ```bash
-git clone https://github.com/Wigge75/VoiceScribe.git
-cd VoiceScribe
-open VoiceScribe.xcodeproj
+git clone https://github.com/Wigge75/VoiKoo.git
+cd VoiKoo
+open VoiKoo.xcodeproj
 ```
 
 In Xcode: **Signing & Capabilities** → Team auswählen → **Cmd+R**
@@ -96,15 +96,15 @@ Die Stil-Shortcuts (⌥1/⌥2/⌥3) wechseln automatisch in den Überarbeitungs-
 Mit aktiviertem Auto-Paste entfällt das manuelle ⌘V:
 
 1. **Einstellungen (⌘,) → System → „Text automatisch einfügen"** aktivieren
-2. Beim ersten Aktivieren öffnen sich die Systemeinstellungen → VoiceScribe unter **Bedienungshilfen** freigeben
+2. Beim ersten Aktivieren öffnen sich die Systemeinstellungen → VoiKoo unter **Bedienungshilfen** freigeben
 3. Ab sofort wird der transkribierte Text direkt in das zuletzt fokussierte Eingabefeld eingefügt
 
-> **Datenschutz:** VoiceScribe markiert den Clipboard-Inhalt mit dem `org.nspasteboard.ConcealedType`-Flag — Clipboard-Manager wie Alfred oder Raycast überspringen den Inhalt automatisch.
+> **Datenschutz:** VoiKoo markiert den Clipboard-Inhalt mit dem `org.nspasteboard.ConcealedType`-Flag — Clipboard-Manager wie Alfred oder Raycast überspringen den Inhalt automatisch.
 
 ### Modus wechseln
 
 - **Tastenkürzel**: ⌥0 togglet zwischen Diktat und Überarbeiten
-- **Menüleiste**: VoiceScribe-Icon klicken → Modus auswählen
+- **Menüleiste**: VoiKoo-Icon klicken → Modus auswählen
 - **Einstellungen**: ⌘, → Tab „Allgemein"
 
 Bei jedem Wechsel per Tastenkürzel erscheint kurz ein Icon-Overlay zur Bestätigung.
@@ -113,7 +113,7 @@ Bei jedem Wechsel per Tastenkürzel erscheint kurz ein Icon-Overlay zur Bestäti
 
 ## KI-Überarbeitung (Überarbeitungs-Modus)
 
-VoiceScribe nutzt **Apple Intelligence** für die Textüberarbeitung — vollständig lokal auf dem Neural Engine, kein Server, keine Installation.
+VoiKoo nutzt **Apple Intelligence** für die Textüberarbeitung — vollständig lokal auf dem Neural Engine, kein Server, keine Installation.
 
 **Voraussetzung:** Apple Intelligence muss in Systemeinstellungen → Apple Intelligence aktiviert sein.
 
@@ -179,7 +179,7 @@ Danach vollständig offline.
 → Oder: Dein Gerät ist nicht kompatibel (Intel-Mac oder Apple Silicon vor M1)
 
 ### Auto-Paste funktioniert nicht
-→ Bedienungshilfen-Berechtigung fehlt: **Systemeinstellungen → Datenschutz & Sicherheit → Bedienungshilfen → VoiceScribe aktivieren**
+→ Bedienungshilfen-Berechtigung fehlt: **Systemeinstellungen → Datenschutz & Sicherheit → Bedienungshilfen → VoiKoo aktivieren**
 
 ### Whisper-Modell lädt nicht
 → Internetverbindung beim ersten Start erforderlich. Danach vollständig offline.  
@@ -192,10 +192,10 @@ Danach vollständig offline.
 
 ## Deinstallation
 
-1. VoiceScribe beenden (Menüleiste → „VoiceScribe beenden")
-2. `VoiceScribe.app` in den Papierkorb
-3. Optional Modelle löschen: `rm -rf ~/Library/Containers/com.stefanwiggeshoff.VoiceScribe/Data/Library/Caches/`
-4. Optional Einstellungen löschen: `defaults delete com.stefanwiggeshoff.VoiceScribe`
+1. VoiKoo beenden (Menüleiste → „VoiKoo beenden")
+2. `VoiKoo.app` in den Papierkorb
+3. Optional Modelle löschen: `rm -rf ~/Library/Containers/com.stefanwiggeshoff.VoiKoo/Data/Library/Caches/`
+4. Optional Einstellungen löschen: `defaults delete com.stefanwiggeshoff.VoiKoo`
 
 ---
 

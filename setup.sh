@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# setup.sh — Einmalige Einrichtung von VoiceScribe
+# setup.sh — Einmalige Einrichtung von VoiKoo
 # Installiert XcodeGen (falls nötig) und generiert das Xcode-Projekt.
 
 set -euo pipefail
 
 echo "╔══════════════════════════════════════╗"
-echo "║       VoiceScribe Setup              ║"
+echo "║       VoiKoo Setup              ║"
 echo "╚══════════════════════════════════════╝"
 echo ""
 
@@ -38,7 +38,7 @@ fi
 
 # 4. Xcode-Projekt generieren
 echo ""
-echo "⚙️   Generiere VoiceScribe.xcodeproj..."
+echo "⚙️   Generiere VoiKoo.xcodeproj..."
 xcodegen generate
 
 echo ""
@@ -48,8 +48,8 @@ echo "╚═══════════════════════�
 echo ""
 echo "Nächste Schritte:"
 echo ""
-echo "  1. VoiceScribe.xcodeproj in Xcode öffnen:"
-echo "     open VoiceScribe.xcodeproj"
+echo "  1. VoiKoo.xcodeproj in Xcode öffnen:"
+echo "     open VoiKoo.xcodeproj"
 echo ""
 echo "  2. In Xcode: Signing & Capabilities → Team setzen"
 echo "     (eigenen Apple-Account oder 'None' für lokales Testen)"
@@ -59,7 +59,7 @@ echo ""
 echo "  4. Beim ersten Start: Mikrofon-Zugriff erlauben"
 echo ""
 echo "  5. In Systemeinstellungen > Datenschutz > Bedienungshilfen:"
-echo "     VoiceScribe erlauben (für Text-Einfügen nötig)"
+echo "     VoiKoo erlauben (für Text-Einfügen nötig)"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "Optional: Ollama für Überarbeitungs-Modus:"
