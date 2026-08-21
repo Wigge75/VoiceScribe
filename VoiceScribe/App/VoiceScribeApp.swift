@@ -58,6 +58,11 @@ struct MenuBarMenuView: View {
             viewModel.toggleRecording()
         }
 
+        Button("Audiodatei importieren…") {
+            viewModel.importAudioFile()
+        }
+        .disabled(!viewModel.canImport)
+
         Divider()
 
         // SettingsLink is the correct macOS 14+ way to open the Settings scene

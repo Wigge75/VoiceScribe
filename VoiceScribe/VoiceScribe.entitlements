@@ -13,5 +13,9 @@
     <!-- Netzwerkzugriff: WhisperKit lädt Modelle von HuggingFace beim ersten Start -->
     <key>com.apple.security.network.client</key>
     <true/>
+
+    <!-- Lesezugriff auf per NSOpenPanel importierte Audiodateien -->
+    <key>com.apple.security.files.user-selected.read-only</key>
+    <true/>
 </dict>
 </plist>

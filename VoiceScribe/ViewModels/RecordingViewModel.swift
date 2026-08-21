@@ -8,6 +8,7 @@ import AVFoundation
 import AppKit
 import Combine
 import KeyboardShortcuts
+import UniformTypeIdentifiers
 
 // MARK: - Recording State
 
@@ -124,6 +125,11 @@ final class RecordingViewModel: ObservableObject {
         return false
     }
 
+    var canImport: Bool {
+        if case .idle = state { return true }
+        return false
+    }
+
     var statusSummary: String {
         switch state {
         case .idle:              return "Halten für Aufnahme (⌥Space)"
@@ -166,6 +172,29 @@ final class RecordingViewModel: ObservableObject {
 
     func reloadWhisperModel() {
         Task { await whisperService.loadModel(settings.whisperModel.rawValue) }
+    }
+
+    // MARK: - Import
+
+    /// Opens a file picker for an existing audio (or screen recording) file
+    /// and runs it through the same transcription/revision pipeline used for
+    /// live recordings. Unlike live recordings, the source file is never deleted.
+    func importAudioFile() {
+        guard canImport else { return }
+
+        let panel = NSOpenPanel()
+        panel.title = "Audiodatei importieren"
+        panel.allowedContentTypes = [.audio, .mpeg4Movie, .quickTimeMovie]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+
+        panelController.show(viewModel: self)
+        panelController.resize(to: 160)
+        currentTask = Task {
+            await pipeline(fileURL: url, cleanupAfter: false)
+        }
     }
 
     // MARK: - Recording
@@ -213,9 +242,11 @@ final class RecordingViewModel: ObservableObject {
 
     // MARK: - Pipeline
 
-    private func pipeline(fileURL: URL) async {
+    private func pipeline(fileURL: URL, cleanupAfter: Bool = true) async {
         defer {
-            audioRecorder.cleanupTempFile(at: fileURL)
+            if cleanupAfter {
+                audioRecorder.cleanupTempFile(at: fileURL)
+            }
         }
 
         do {
